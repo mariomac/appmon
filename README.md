@@ -13,8 +13,8 @@ How to configure
 ----------------
 
 * Edit the next properties of the conf/application.conf file
-** mongo.host: hostname or IP of your MongoDB installation
-** mongo.port: port of your MongoDB installation
+  * mongo.host: hostname or IP of your MongoDB installation
+  * mongo.port: port of your MongoDB installation
 
 How to run:
 -----------
