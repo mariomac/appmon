@@ -15,5 +15,5 @@ libraryDependencies ++= Seq(
   cache,
   javaWs,
   "org.mongodb" % "mongo-java-driver" % "[2.12.2,)",
-  "es.bsc" % "mongoal" % "0.1"
+  "es.bsc" % "mongoal" % "0.1.1" changing()
 )
