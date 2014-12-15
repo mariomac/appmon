@@ -63,9 +63,13 @@ public class QueriesDBMapper {
         if(mongoAlQG == null) {
             mongoAlQG = new QueryGenerator(DBManager.instance.getDatabase());
         }
-        ArrayNode ret = new ArrayNode(JsonNodeFactory.instance);
 
-        return (ArrayNode)Json.parse(mongoAlQG.query(query).toString());
+        BasicDBList dbl = new BasicDBList();
+        Iterable<DBObject> it = mongoAlQG.query(query);
+        for(DBObject dbo : it) {
+            dbl.add(dbo);
+        }
+        return (ArrayNode)Json.parse(dbl.toString());
 
     }
 
