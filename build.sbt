@@ -15,5 +15,9 @@ libraryDependencies ++= Seq(
   cache,
   javaWs,
   "org.mongodb" % "mongo-java-driver" % "[2.12.2,)",
-  "es.bsc" % "mongoal" % "0.1.1" changing()
+  "es.bsc" % "mongoal" % "0.1.1" changing(),
+
+// test libraries here
+  "org.mockito" % "mockito-all" % "[1.10.17,)" % "test"
 )
+
