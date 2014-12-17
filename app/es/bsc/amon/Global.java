@@ -16,6 +16,7 @@
 
 package es.bsc.amon;
 
+import es.bsc.amon.mq.MQManager;
 import play.Application;
 import play.Configuration;
 import play.GlobalSettings;
@@ -23,18 +24,18 @@ import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
-import play.mvc.SimpleResult;
-import scala.concurrent.Future;
 
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Created by mmacias on 03/06/14.
  */
 public class Global extends GlobalSettings {
+
 	@Override
 	public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
 		Configuration c = super.onLoadConfig(configuration, file, classLoader);
@@ -46,6 +47,8 @@ public class Global extends GlobalSettings {
 
 		DBManager.instance.init(p);
 
+		MQManager.instance.init(configuration.getString("mq.url"));
+
 		return c;
 	}
 
@@ -54,6 +57,7 @@ public class Global extends GlobalSettings {
 
 		super.onStop(app);
 		DBManager.instance.close();
+		MQManager.instance.stop();
 	}
 
     @Override

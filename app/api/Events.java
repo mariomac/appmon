@@ -58,4 +58,14 @@ public class Events extends Controller {
 		return notFound("Didn't find event with _id " + id);
 	}
 
+	public static Result delete(String id) {
+		try {
+			EventsDBMapper.getInstance().delete(id);
+			return ok();
+		} catch(Exception e) {
+			Logger.error(e.getMessage(),e);
+		}
+		return notFound("Didn't find event with _id " + id);
+	}
+
 }

@@ -145,6 +145,12 @@ public class EventsDBMapper {
 		return null;
 	}
 
+    public void delete(String id) {
+        BasicDBObjectBuilder q = BasicDBObjectBuilder.start();
+        q.add(_ID, new ObjectId(id));
+        colEvents.remove(q.get());
+    }
+
 	public ObjectNode markAsFinished(String id) {
 		BasicDBObjectBuilder q = BasicDBObjectBuilder.start();
 		q.add(_ID,new ObjectId(id));

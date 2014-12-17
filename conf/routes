@@ -24,6 +24,7 @@ POST    /event                                   api.Events.post()
 PATCH   /event                                   api.Events.update()
 GET     /event/:id                               api.Events.get(id:String)
 PATCH   /event/:id                               api.Events.finish(id:String)
+DELETE  /event/:id                               api.Events.delete(id:String)
 
 POST    /query                                   api.Queries.post()
 

@@ -46,7 +46,6 @@ public class DBManager {
 			Logger.info("Connecting to mongodb://"+host+":"+port+"/"+dbName);
 			client = new MongoClient(host,port);
 			database = client.getDB(dbName);
-
 		} catch(Throwable e) {
 			Logger.info(e.getMessage());
 			throw new RuntimeException(e);
