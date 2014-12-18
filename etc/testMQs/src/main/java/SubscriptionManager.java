@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * Created by mmacias on 18/12/14.
  */
 public class SubscriptionManager {
-    public static final String MQ_ADDRESS = "amqp://localhost:5762/testmqs";
+    public static final String MQ_ADDRESS = "amqp://localhost/testmqs";
 
     private Messenger msn;
     private boolean used = false;

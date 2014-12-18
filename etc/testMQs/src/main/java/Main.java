@@ -18,15 +18,25 @@ import java.io.InputStreamReader;
 public class Main {
     public static final void main(String[] args) {
         BrokerService brokerService = null;
+        SubscriptionManager sm = null;
         try {
-
             brokerService = new BrokerService();
-            brokerService.addConnector("amqp://0.0.0.0:5762");
+// configure the broker
+            brokerService.setBrokerName("localhost");
+            brokerService.addConnector("amqp://0.0.0.0:5672");
+            brokerService.setUseJmx(false);
             brokerService.setPersistent(false);
-                    //BrokerFactory.createBroker("broker:(amqp://0.0.0.0:5762)?persistent=false");
             brokerService.start();
 
-            SubscriptionManager sm = new SubscriptionManager();
+//                    ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?create=false");
+//            brokerService = new BrokerService();
+//            brokerService.addConnector("amqp://0.0.0.0:5672");
+//            brokerService.setPersistent(false);
+//            //BrokerFactory.createBroker("broker:(amqp://0.0.0.0:5762)?persistent=false");
+//            brokerService.addService();
+//            brokerService.start();
+
+            sm = new SubscriptionManager();
             sm.start();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,26 +46,32 @@ public class Main {
 //                System.out.print("Command: ");
 //                line = br.readLine();
 //                if(line.startsWith("send ")) {
-                    Messenger msn = Messenger.Factory.create(); //"Msn"+mn);
-                    msn.start();
-                    Message ms = Message.Factory.create();
-                    ms.setAddress(SubscriptionManager.MQ_ADDRESS);
+            Messenger msn = Messenger.Factory.create(); //"Msn"+mn);
+            msn.start();
+            Message ms = Message.Factory.create();
+            ms.setAddress(SubscriptionManager.MQ_ADDRESS);
 
             System.out.print("sending... ");
-                    ms.setBody(new AmqpValue(line.substring(5)));
-                    mn++;
-                    msn.put(ms);
+            ms.setBody(new AmqpValue(line.substring(5)));
+            mn++;
+            msn.put(ms);
             msn.setTimeout(3000);
-                    msn.send();
+            msn.send();
             System.out.println("sent!");
-                    msn.stop();
+            msn.stop();
 //                }
 //            } while (!"exit".equalsIgnoreCase(line));
-            sm.stop();
-            brokerService.stop();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            if (sm != null) sm.stop();
+
+            if (brokerService != null) brokerService.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
