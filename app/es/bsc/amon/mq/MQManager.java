@@ -1,20 +1,12 @@
 package es.bsc.amon.mq;
 
-import org.apache.qpid.proton.TimeoutException;
-import org.apache.qpid.proton.amqp.messaging.AmqpValue;
-import org.apache.qpid.proton.amqp.messaging.ApplicationProperties;
-import org.apache.qpid.proton.engine.Session;
-import org.apache.qpid.proton.engine.impl.SessionImpl;
-import org.apache.qpid.proton.message.Message;
-import org.apache.qpid.proton.messenger.Messenger;
-
 import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
  * Created by mmacias on 17/12/14.
  */
-public class MQManager implements Runnable {
+public class MQManager { /*implements Runnable {
 	public static final MQManager instance = new MQManager();
 
 	private static Logger log = Logger.getLogger(MQManager.class.getName());
@@ -85,4 +77,5 @@ public class MQManager implements Runnable {
 		b.append("END").append("\n");
 		System.out.println(b.toString());
 	}
+	*/
 }

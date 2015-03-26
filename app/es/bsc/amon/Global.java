@@ -47,7 +47,7 @@ public class Global extends GlobalSettings {
 
 		DBManager.instance.init(p);
 
-		MQManager.instance.init(configuration.getString("mq.url"));
+		//MQManager.instance.init(configuration.getString("mq.url"));
 
 		return c;
 	}
@@ -57,7 +57,7 @@ public class Global extends GlobalSettings {
 
 		super.onStop(app);
 		DBManager.instance.close();
-		MQManager.instance.stop();
+		//MQManager.instance.stop();
 	}
 
     @Override

@@ -31,8 +31,8 @@ public class GuiMetricsDBMapper {
 
         try {
             collection = database.createCollection(COLL_NAME,new BasicDBObject());
-        } catch(CommandFailureException cfe) {
-            if("collection already exists".equalsIgnoreCase(cfe.getCommandResult().getErrorMessage())) {
+        } catch(MongoException cfe) {
+            if(cfe.getCode() == DBManager.COLLECTION_ALREADY_EXISTS) {
                 Logger.info("Collection '"+ COLL_NAME +"' already exists. Continuing normally...");
             }
             collection = database.getCollection(COLL_NAME);

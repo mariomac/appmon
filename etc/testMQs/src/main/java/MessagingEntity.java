@@ -1,19 +1,10 @@
-import org.apache.qpid.amqp_1_0.jms.impl.ConnectionFactoryImpl;
-import org.apache.qpid.amqp_1_0.jms.impl.DestinationImpl;
-import org.apache.qpid.amqp_1_0.jms.impl.QueueImpl;
-import org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory;
-
+import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import javax.jms.*;
-import javax.naming.NamingException;
 
 /**
  * Created by mmacias on 18/12/14.
@@ -119,7 +110,6 @@ public class MessagingEntity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private void stop() {

@@ -65,8 +65,8 @@ public class EventsDBMapper {
             colEvents = database.createCollection(COLL_NAME,
                     new BasicDBObject("capped", true) //enable round robin database
                             .append("size", collectionSize));
-        } catch(CommandFailureException cfe) {
-            if("collection already exists".equalsIgnoreCase(cfe.getCommandResult().getErrorMessage())) {
+        } catch(MongoException cfe) {
+            if(cfe.getCode() == DBManager.COLLECTION_ALREADY_EXISTS) {
                 Logger.info("Collection '"+ COLL_NAME +"' already exists. Continuing normally...");
             }
             colEvents = database.getCollection(COLL_NAME);

@@ -17,6 +17,7 @@
 package es.bsc.amon;
 
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import play.Logger;
 import play.libs.Json;
 
@@ -28,6 +29,7 @@ import java.util.Properties;
 
 public class DBManager {
 	public static final DBManager instance = new DBManager();
+    public static final int COLLECTION_ALREADY_EXISTS = 17399;
 
 	private MongoClient client;
 	private DB database;
@@ -69,9 +71,13 @@ public class DBManager {
     }
 
     public BasicDBList find(String collectionName, DBObject query) {
-        return find(collectionName, query, null);
+        return find(collectionName, query, null, null);
     }
-    public BasicDBList find(String collectionName, DBObject query, Integer limit) {
+
+    public BasicDBList find(String collectionName, DBObject query, DBObject orderby) {
+        return find(collectionName, query, orderby, null);
+    }
+    public BasicDBList find(String collectionName, DBObject query, DBObject orderby, Integer limit) {
         BasicDBList result = new BasicDBList();
 
         DBCursor c = null;
@@ -80,9 +86,17 @@ public class DBManager {
         } else {
             c = database.getCollection(collectionName).find(query);
         }
+
+        if(orderby == null) {
+            c.sort(orderby);
+        }
+
+
+
         if(limit != null && limit > 0) {
             c = c.limit(limit);
         }
+
         while(c.hasNext()) {
             result.add(c.next());
         }

@@ -21,6 +21,7 @@ import es.bsc.amon.DBManager;
 import es.bsc.amon.controller.QueriesDBMapper;
 
 import es.bsc.mongoal.QueryGenerator;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;

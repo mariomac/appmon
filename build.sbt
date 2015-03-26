@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   javaEbean,
   cache,
   javaWs,
-  "org.mongodb" % "mongo-java-driver" % "[2.12.2,)",
-  "es.bsc" % "mongoal" % "0.1.1" changing(),
-  "org.apache.qpid" % "proton-j" % "0.8"
+  "org.mongodb" % "mongo-java-driver" % "[3.0,)",
+  "es.bsc" % "mongoal" % "0.1.1" changing()
+  //"org.apache.qpid" % "proton-j" % "0.8"
 )

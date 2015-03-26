@@ -1,7 +1,5 @@
 package es.bsc.amon.watch;
 
-import org.apache.qpid.proton.messenger.Messenger;
-
 /**
  * Created by mmacias on 17/12/14.
  */
