@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: org.apache.qpid:qpid-client:0.32:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.qpid/qpid-client/jars/qpid-client-0.32.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.qpid/qpid-client/docs/qpid-client-0.32-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.qpid/qpid-client/srcs/qpid-client-0.32-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -28,6 +28,7 @@ import play.mvc.Results;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -47,7 +48,11 @@ public class Global extends GlobalSettings {
 
 		DBManager.instance.init(p);
 
-		//MQManager.instance.init(configuration.getString("mq.url"));
+		try {
+			MQManager.instance.init(configuration.getString("mq.url"),configuration.getString("mq.name"));
+		} catch(URISyntaxException e) {
+			Logger.getLogger(Global.class.getName()).warning("Error when creating the MQ Manager instance: " + e.getMessage());
+		}
 
 		return c;
 	}

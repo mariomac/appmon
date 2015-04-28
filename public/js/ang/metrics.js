@@ -222,7 +222,7 @@
                     }]
                 };
 
-                // get last timestamp of an application
+                // get last timestamp of an application∫∫∫
                 var getLastTimestamp =
                     [{"$match":{"appId":$scope.info.appId}},
                         {"$group" : { "_id": null,
