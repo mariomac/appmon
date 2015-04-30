@@ -20,6 +20,7 @@ import es.bsc.amon.mq.MQManager;
 import play.Application;
 import play.Configuration;
 import play.GlobalSettings;
+import play.Logger;
 import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -30,7 +31,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * Created by mmacias on 03/06/14.
@@ -49,9 +49,9 @@ public class Global extends GlobalSettings {
 		DBManager.instance.init(p);
 
 		try {
-			MQManager.instance.init(configuration.getString("mq.url"),configuration.getString("mq.name"));
-		} catch(URISyntaxException e) {
-			Logger.getLogger(Global.class.getName()).warning("Error when creating the MQ Manager instance: " + e.getMessage());
+			MQManager.instance.init();
+		} catch(Exception e) {
+			Logger.error("Error when creating the MQ Manager instance: " + e.getMessage(), e);
 		}
 
 		return c;
@@ -62,7 +62,7 @@ public class Global extends GlobalSettings {
 
 		super.onStop(app);
 		DBManager.instance.close();
-		//MQManager.instance.stop();
+		MQManager.instance.stop();
 	}
 
     @Override

@@ -1,18 +1,13 @@
 package es.bsc.amon.mq;
 
-import amqp.TestServiceImpl;
-import easyrpc.client.ClientFactory;
-import easyrpc.client.protocol.amqp.AmqpClient;
-import easyrpc.client.serialization.jsonrpc.JSONCaller;
-import easyrpc.server.RpcServer;
-import easyrpc.server.protocol.amqp.AmqpService;
-import easyrpc.server.serialization.jsonrpc.JSONCallee;
+import play.Logger;
 
+import javax.jms.*;
 import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.logging.Logger;
+import java.util.Properties;
 
 /**
  * Created by mmacias on 17/12/14.
@@ -20,23 +15,74 @@ import java.util.logging.Logger;
 public class MQManager {
 	public static final MQManager instance = new MQManager();
 
-	RpcServer server;
+	Context context;
+	Connection connection;
+	ConnectionFactory connectionFactory;
+	Session session;
+	Queue queue;
+	MessageConsumer messageConsumer;
+	MessageProducer messageProducer;
 
-	private static Logger log = Logger.getLogger(MQManager.class.getName());
 
-	public void init(String mqUrl, String qName) throws URISyntaxException {
-		log.info("Initializing MQ manager at " + mqUrl + " / " + qName);
-		URI brokerUri = new URI(mqUrl); //new URI("amqp://guest:guest@localhost:5672?clientid=test-client&remote-host=default");
-		server = new RpcServer(
-				new AmqpService(brokerUri, qName),
-				new JSONCallee());
+	MessageDispatcher messageDispatcherInstance;
 
-		server.addEndpoint(new TestServiceImpl());
+	public void init() {
 
-		System.setProperty(Context.PROVIDER_URL,"file:/");
-		Thread th = new Thread(server::start);
-		th.start();
-		log.info("MQ manager correctly initiated");
+		try {
+			Logger.info("Initiating Message Queue Manager...");
+
+			context = new InitialContext();
+
+			connectionFactory
+					= (ConnectionFactory) context.lookup("asceticpaas");
+			connection = connectionFactory.createConnection();
+			connection.start();
+
+			session = connection.createSession(true, Session.SESSION_TRANSACTED);
+			queue = (Queue) context.lookup("appmon");
+
+			messageConsumer = session.createConsumer(queue);
+
+			messageDispatcherInstance = new MessageDispatcher();
+			new Thread(messageDispatcherInstance).start();
+			Logger.info("Message Queue Manager Sucessfully created...");
+		} catch(JMSException|NamingException e) {
+			Logger.error("Error initializing MQ Manager: " + e.getMessage() + " Continuing startup without MQ services...");
+		}
+	}
+
+	public void stop() {
+		if(messageDispatcherInstance != null) messageDispatcherInstance.running = false;
+		try {
+			if(messageConsumer != null) messageConsumer.close();
+			if(session != null) session.close();
+			if(connection != null) connection.close();
+			if(context != null) context.close();
+		} catch(Exception e) {
+			Logger.error(e.getMessage());
+		}
+	}
+
+	private class MessageDispatcher implements Runnable {
+		boolean running;
+		@Override
+		public void run() {
+			running = true;
+			while(running) {
+				try {
+					TextMessage message = (TextMessage)messageConsumer.receive();
+					Logger.debug("received message: " + message.getText());
+					session.commit();
+				} catch(JMSException e) {
+					if(running) {
+						Logger.error("Error dispatching messages: " + e.getMessage());
+					} else {
+						Logger.debug("While closing MessageDispatcher: " + e.getMessage());
+					}
+				}
+			}
+			Logger.info("MessageDispatcher successfully finished...");
+		}
 	}
 
 }
