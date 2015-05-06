@@ -7,6 +7,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Properties;
 
 /**
@@ -38,7 +39,8 @@ public class MQManager {
 			connection = connectionFactory.createConnection();
 			connection.start();
 
-			session = connection.createSession(true, Session.SESSION_TRANSACTED);
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
 			queue = (Queue) context.lookup("appmon");
 
 			messageConsumer = session.createConsumer(queue);
@@ -63,6 +65,8 @@ public class MQManager {
 		}
 	}
 
+
+
 	private class MessageDispatcher implements Runnable {
 		boolean running;
 		@Override
@@ -72,12 +76,26 @@ public class MQManager {
 				try {
 					TextMessage message = (TextMessage)messageConsumer.receive();
 					Logger.debug("received message: " + message.getText());
-					session.commit();
-				} catch(JMSException e) {
+					Hashtable<String,String> env = new Hashtable<String,String>();
+					env.put(Context.INITIAL_CONTEXT_FACTORY,
+							"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory");
+					env.put(Context.PROVIDER_URL, "file:/tmp");
+					env.put("connectionfactory.asceticpaas", "amqp://localhost:5672");
+					env.put("topic.topic", "mytopic");
+
+					context.addToEnvironment("topic.topic", "mytopic");
+					Context responseContext = context; //new InitialContext(env);
+
+					Topic topic = (Topic) responseContext.lookup("topic");
+					MessageProducer producer = session.createProducer(topic);
+					TextMessage response = session.createTextMessage("Hello " + message.getText());
+					producer.send(response);
+
+				} catch(Exception e) {
 					if(running) {
-						Logger.error("Error dispatching messages: " + e.getMessage());
+						Logger.error("Error dispatching messages: " + e.getMessage(), e);
 					} else {
-						Logger.debug("While closing MessageDispatcher: " + e.getMessage());
+						Logger.debug("While closing MessageDispatcher: " + e.getMessage(), e);
 					}
 				}
 			}

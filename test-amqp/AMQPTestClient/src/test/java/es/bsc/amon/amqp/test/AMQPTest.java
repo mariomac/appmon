@@ -29,22 +29,43 @@ public class AMQPTest
     public void testCall() throws NamingException, JMSException {
 		context = new InitialContext();
 
-		ConnectionFactory connectionFactory
-				= (ConnectionFactory) context.lookup("asceticpaas");
-		Connection connection = connectionFactory.createConnection();
+		TopicConnectionFactory connectionFactory
+				= (TopicConnectionFactory) context.lookup("asceticpaas");
+
+
+		TopicConnection connection = connectionFactory.createTopicConnection();
+
+		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+
+		Queue sendQueue = (Queue) context.lookup("appmon");
+		Topic topic = (Topic) context.lookup("topic");
+
+
+		TopicSubscriber clientTopic = session.createSubscriber(topic);
 		connection.start();
 
-		Session session = connection.createSession(true, Session.SESSION_TRANSACTED);
+		MessageProducer messageProducer = session.createProducer(sendQueue);
 
-		Queue queue = (Queue) context.lookup("appmon");
-
-		MessageProducer messageProducer = session.createProducer(queue);
-
-		TextMessage message = session.createTextMessage("Hello world!");
+		TextMessage message = session.createTextMessage("perracozz");
 		messageProducer.send(message);
-		session.commit();
+
+		message = session.createTextMessage("zorronzz");
+		messageProducer.send(message);
+		message = session.createTextMessage("byezz");
+		messageProducer.send(message);
+
+		System.out.println("Message sent");
+		String s = "";
+
+		while(!"Hello bye".equals(s)) {
+			System.out.println("Waiting for a new message...");
+			TextMessage tm = (TextMessage) clientTopic.receive();
+			s = tm.getText();
+			System.out.println("received message: " + s);
+		}
+
 
 		connection.close();
 		context.close();
-    }
+	}
 }
