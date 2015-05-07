@@ -1,13 +1,11 @@
 package es.bsc.amon.amqp.test;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import java.util.Properties;
 
 
 public class AMQPTest
@@ -26,8 +24,14 @@ public class AMQPTest
 	/**
      * Rigourous Test :-)
      */
-    public void testCall() throws NamingException, JMSException {
-		context = new InitialContext();
+    public void testCall() throws Exception {
+
+		String appName = "appJarl"+System.currentTimeMillis()%1000;
+		System.out.println("Initiating " + appName);
+		Properties p = new Properties();
+		p.load(getClass().getResourceAsStream("/jndi.properties"));
+		p.put("topic.topic", "application-monitor.monitoring." + appName + ".measurement");
+		context = new InitialContext(p);
 
 		TopicConnectionFactory connectionFactory
 				= (TopicConnectionFactory) context.lookup("asceticpaas");
@@ -36,6 +40,7 @@ public class AMQPTest
 		TopicConnection connection = connectionFactory.createTopicConnection();
 
 		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+
 
 		Queue sendQueue = (Queue) context.lookup("appmon");
 		Topic topic = (Topic) context.lookup("topic");
@@ -46,13 +51,17 @@ public class AMQPTest
 
 		MessageProducer messageProducer = session.createProducer(sendQueue);
 
-		TextMessage message = session.createTextMessage("perracozz");
+		TextMessage message = session.createTextMessage("{\n" +
+				"\t\"Command\" : \"initiateMonitoring\",\n" +
+				"\t\"SLAId\" : \"alskdfj\",\n" +
+				"\t\"ApplicationId\" : \""+ appName + "\",\n" +
+				"\t\"DeploymentId\" : \"lasdkjf\",\n" +
+				"\t\"VMId\" : \"asdfljsladkfj\",\n" +
+				"\t\"Terms\" : [\"list\", \"of\", \"terms\", \"to\", \"monitor\" ],\n" +
+				"\t\"Frequency\" : 12039\n" +
+				"}");
 		messageProducer.send(message);
 
-		message = session.createTextMessage("zorronzz");
-		messageProducer.send(message);
-		message = session.createTextMessage("byezz");
-		messageProducer.send(message);
 
 		System.out.println("Message sent");
 		String s = "";

@@ -1,18 +1,17 @@
 package es.bsc.amon.mq;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import es.bsc.amon.mq.dispatch.InitiateMonitoringDispatcher;
 import play.Logger;
+import play.libs.Json;
 
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Properties;
+import java.util.Map;
+import java.util.TreeMap;
 
-/**
- * Created by mmacias on 17/12/14.
- */
 public class MQManager {
 	public static final MQManager instance = new MQManager();
 
@@ -26,6 +25,8 @@ public class MQManager {
 
 
 	MessageDispatcher messageDispatcherInstance;
+
+	Map<String,CommandDispatcher> commandDispatchers = new TreeMap<String,CommandDispatcher>();
 
 	public void init() {
 
@@ -48,6 +49,9 @@ public class MQManager {
 			messageDispatcherInstance = new MessageDispatcher();
 			new Thread(messageDispatcherInstance).start();
 			Logger.info("Message Queue Manager Sucessfully created...");
+
+			commandDispatchers.put("initiateMonitoring", new InitiateMonitoringDispatcher(context, session));
+
 		} catch(JMSException|NamingException e) {
 			Logger.error("Error initializing MQ Manager: " + e.getMessage() + " Continuing startup without MQ services...");
 		}
@@ -75,22 +79,11 @@ public class MQManager {
 			while(running) {
 				try {
 					TextMessage message = (TextMessage)messageConsumer.receive();
-					Logger.debug("received message: " + message.getText());
-					Hashtable<String,String> env = new Hashtable<String,String>();
-					env.put(Context.INITIAL_CONTEXT_FACTORY,
-							"org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory");
-					env.put(Context.PROVIDER_URL, "file:/tmp");
-					env.put("connectionfactory.asceticpaas", "amqp://localhost:5672");
-					env.put("topic.topic", "mytopic");
+					Logger.trace("received message: " + message.getText());
 
-					context.addToEnvironment("topic.topic", "mytopic");
-					Context responseContext = context; //new InitialContext(env);
-
-					Topic topic = (Topic) responseContext.lookup("topic");
-					MessageProducer producer = session.createProducer(topic);
-					TextMessage response = session.createTextMessage("Hello " + message.getText());
-					producer.send(response);
-
+					ObjectNode on = (ObjectNode)Json.parse(message.getText());
+					String command =  on.get(CommandDispatcher.FIELD_COMMAND).textValue();
+					commandDispatchers.get(command).onCommand(on);
 				} catch(Exception e) {
 					if(running) {
 						Logger.error("Error dispatching messages: " + e.getMessage(), e);
