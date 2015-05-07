@@ -1,0 +1,14 @@
+[ "SLAM -> AppMonitor subscription",
+
+{
+	"Command" : "initiateMonitoring",
+	"SLAId" : "alskdfj",  /* probably not needed */
+	"ApplicationId" : "lkasdfjlkj",
+	"DeploymentId" : "lasdkjf",
+	"VMId" : "asdfljsladkfj",
+	"Terms" : ["list", "of", "terms", "to", "monitor" ],
+	"Frequency" : 12039 /* in seconds? */
+}
+
+
+]
