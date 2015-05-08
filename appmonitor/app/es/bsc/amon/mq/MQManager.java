@@ -2,6 +2,7 @@ package es.bsc.amon.mq;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.mq.dispatch.InitiateMonitoringDispatcher;
+import es.bsc.amon.mq.notif.PeriodicNotifier;
 import play.Logger;
 import play.libs.Json;
 
@@ -9,6 +10,8 @@ import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -21,7 +24,6 @@ public class MQManager {
 	Session session;
 	Queue queue;
 	MessageConsumer messageConsumer;
-	MessageProducer messageProducer;
 
 
 	MessageDispatcher messageDispatcherInstance;
@@ -50,7 +52,7 @@ public class MQManager {
 			new Thread(messageDispatcherInstance).start();
 			Logger.info("Message Queue Manager Sucessfully created...");
 
-			commandDispatchers.put("initiateMonitoring", new InitiateMonitoringDispatcher(context, session));
+			commandDispatchers.put("initiateMonitoring", new InitiateMonitoringDispatcher(session));
 
 		} catch(JMSException|NamingException e) {
 			Logger.error("Error initializing MQ Manager: " + e.getMessage() + " Continuing startup without MQ services...");
@@ -94,6 +96,11 @@ public class MQManager {
 			}
 			Logger.info("MessageDispatcher successfully finished...");
 		}
+	}
+
+	private class PeriodicNotificationSender implements Runnable {
+		List<PeriodicNotifier> notifier = new ArrayList<PeriodicNotifier>();
+
 	}
 
 }

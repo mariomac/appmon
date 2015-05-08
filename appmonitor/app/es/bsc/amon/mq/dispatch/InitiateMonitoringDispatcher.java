@@ -1,58 +1,83 @@
 package es.bsc.amon.mq.dispatch;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.mq.CommandDispatcher;
 import play.Logger;
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 
 public class InitiateMonitoringDispatcher implements CommandDispatcher {
-	private static final String TOPIC_PREFIX = "application-monitor.monitoring.";
-	private static final String TOPIC_SUFFIX = ".measurement";
+
 
 	private static final String FIELD_APP_ID = "ApplicationId";
+	private static final String FIELD_DEPLOYMENT_ID = "DeploymentId";
+	private static final String FIELD_TERMS = "Terms";
+	private static final String FIELD_FREQUENCY = "Frequency";
+	private static final String FIELD_SLA_ID = "SLAId";
 
-	private Context context;
+	private static final long DEFAULT_FREQUENCY = 5*60*1000;
+
+
 	private Session session;
 
-	public InitiateMonitoringDispatcher(Context context, Session session) {
-		this.context = context;
+	public InitiateMonitoringDispatcher(Session session) {
 		this.session = session;
 	}
 
+	private static String getString(ObjectNode n, String field) {
+		JsonNode jn = n.get(field);
+		return jn == null ? null : jn.textValue();
+	}
+
+
 	@Override
 	public void onCommand(ObjectNode msgBody) {
-		Logger.debug("InitiateMonitoringDispatcheasdfadsfadsafr.onCommand = " + msgBody.toString());
-		String appId = msgBody.get(FIELD_APP_ID).textValue();
-		final String topicName = new StringBuilder(TOPIC_PREFIX).append(appId).append(TOPIC_SUFFIX).toString();
-		String topicKey = "topic." + appId;
 		try {
-			Properties p = new Properties();
-			p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndi.properties"));
-			p.put(topicKey,topicName);
-			final Context context = new InitialContext(p);
-			context.addToEnvironment(topicKey, topicName);
-			final Topic topic = (Topic) context.lookup(appId);
-			final MessageProducer producer = session.createProducer(topic);
+			String appId = getString(msgBody,FIELD_APP_ID);
+			String deploymentId = getString(msgBody, FIELD_DEPLOYMENT_ID);
+			String slaId = getString(msgBody, FIELD_SLA_ID);
 
-			new Timer().schedule(new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						TextMessage response = session.createTextMessage(topicName + " - " + UUID.randomUUID());
-						producer.send(response);
-					} catch (JMSException e) {
-						Logger.error(e.getMessage(),e);
+			if(appId == null && deploymentId == null && slaId == null) {
+				Exception ife = new IllegalArgumentException("appId == null && deploymentId == null && slaId == null");
+				throw ife;
+			}
+
+			JsonNode termsJson = msgBody.get(FIELD_TERMS);
+			List<String> terms = new ArrayList<String>();
+
+			if(termsJson != null && termsJson.isTextual()) {
+				terms.add(termsJson.textValue());
+			} else if(termsJson != null && termsJson.isArray()) {
+				for(JsonNode jn :(termsJson)) {
+					if(jn.isTextual()) {
+						terms.add(jn.textValue());
 					}
 				}
-			},0,4000);
+			}
+
+			if(termsJson == null || terms.size() == 0) {
+				throw new IllegalArgumentException("There are no valid SLA terms: " + termsJson);
+			}
+
+			JsonNode freqJson = msgBody.get(FIELD_FREQUENCY);
+			long frequency = freqJson == null ? DEFAULT_FREQUENCY : freqJson.asLong(DEFAULT_FREQUENCY);
+
+			AppMeasuresNotifier amn = new AppMeasuresNotifier(appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
+
+
+			// TODO: METER TODA LA MIERDACA A CONTINUACIÓN EN LA CLASE APPMEASUERESNOTIFIER
+
+
+
+
+
+		} catch(IllegalArgumentException e ) {
+			Logger.debug("Bad command format: " + e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
 			Logger.error(e.getMessage(), e);
 		}
 	}
