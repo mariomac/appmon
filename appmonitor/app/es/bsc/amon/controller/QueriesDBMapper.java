@@ -19,24 +19,20 @@ package es.bsc.amon.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import es.bsc.amon.DBManager;
 import es.bsc.mongoal.QueryGenerator;
-import play.Logger;
 import play.libs.Json;
 
 /**
  * Created by mmacias on 02/07/14.
  */
-public class QueriesDBMapper {
-    public static final QueriesDBMapper instance = new QueriesDBMapper();
+public enum QueriesDBMapper {
+	INSTANCE;
     private static es.bsc.mongoal.QueryGenerator mongoAlQG = null;
-    private QueriesDBMapper() {}
 
     /**
      * Uses the MongoDB Json query language
@@ -48,9 +44,9 @@ public class QueriesDBMapper {
         ArrayNode ret = new ArrayNode(JsonNodeFactory.instance);
 
         if(raw instanceof BasicDBObject) {
-            ret = (ArrayNode)Json.parse(EventsDBMapper.getInstance().aggregate((BasicDBObject)raw).toString());
+            ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBObject) raw).toString());
         } else if(raw instanceof BasicDBList) {
-            ret = (ArrayNode)Json.parse(EventsDBMapper.getInstance().aggregate((BasicDBList)raw).toString());
+            ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBList) raw).toString());
         }
 
         return ret;
@@ -61,7 +57,7 @@ public class QueriesDBMapper {
      */
     public ArrayNode aggregate(String query) {
         if(mongoAlQG == null) {
-            mongoAlQG = new QueryGenerator(DBManager.instance.getDatabase());
+            mongoAlQG = new QueryGenerator(DBManager.INSTANCE.getDatabase());
         }
 
         BasicDBList dbl = new BasicDBList();

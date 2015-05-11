@@ -2,11 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="92591dbf-052f-4352-8783-84637b425379" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/AppMeasuresNotifier.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/notif/PeriodicNotificationException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/notif/PeriodicNotifier.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java" afterPath="$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/AppMeasuresNotifier.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/AppMeasuresNotifier.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/http/Apps.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/http/Apps.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/AppsDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/AppsDBMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/DBManager.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/DBManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/http/Events.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/http/Events.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/EventsDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/EventsDBMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/Global.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/Global.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/http/Gui.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/http/Gui.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/gui/GuiMetricsDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/gui/GuiMetricsDBMapper.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/InitiateMonitoringDispatcher.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/InitiateMonitoringDispatcher.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/MQManager.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/MQManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/http/Queries.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/http/Queries.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/QueriesDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/QueriesDBMapper.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/util/tree/TreeNode.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/util/tree/TreeNode.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="AMQPTestClient.iws" />
@@ -33,8 +43,8 @@
       <file leaf-file-name="AMQPTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.6875">
+              <caret line="62" column="34" selection-start-line="62" selection-start-column="34" selection-end-line="62" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -157,8 +167,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -227,7 +236,8 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -597,15 +607,19 @@
       <workItem from="1430994243652" duration="124000" />
       <workItem from="1430994838667" duration="2405000" />
       <workItem from="1431073857655" duration="698000" />
+      <workItem from="1431098868945" duration="558000" />
+      <workItem from="1431329468450" duration="254000" />
+      <workItem from="1431345683472" duration="1254000" />
+      <workItem from="1431349007363" duration="2732000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12549000" />
+    <option name="totallyTimeSpent" value="17347000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1680" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -656,6 +670,42 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/jndi.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/resources/jndi.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -795,21 +845,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6875">
+          <caret line="62" column="34" selection-start-line="62" selection-start-column="34" selection-end-line="62" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/resources/jndi.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="5" column="21" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/es/bsc/amon/amqp/test/AMQPTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

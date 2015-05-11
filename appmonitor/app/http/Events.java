@@ -28,7 +28,7 @@ public class Events extends Controller {
 
         ObjectNode body = (ObjectNode)request().body().asJson();
 
-        return ok(EventsDBMapper.getInstance().storeEvent(body).toString());
+        return ok(EventsDBMapper.INSTANCE.storeEvent(body).toString());
     }
 
 	@BodyParser.Of(BodyParser.Json.class)
@@ -37,7 +37,7 @@ public class Events extends Controller {
 	}
 
 	public static Result get(String id) {
-		String s = EventsDBMapper.getInstance().getString(id);
+		String s = EventsDBMapper.INSTANCE.getString(id);
 		if(s == null) {
 			return notFound("Event with _id " + id + " does not exist");
 		} else {
@@ -47,7 +47,7 @@ public class Events extends Controller {
 
 	public static Result finish(String id) {
 		try {
-			ObjectNode o = EventsDBMapper.getInstance().markAsFinished(id);
+			ObjectNode o = EventsDBMapper.INSTANCE.markAsFinished(id);
 			return ok(o.toString());
 		} catch(Exception e) {
 			Logger.error(e.getMessage(),e);
@@ -57,7 +57,7 @@ public class Events extends Controller {
 
 	public static Result delete(String id) {
 		try {
-			EventsDBMapper.getInstance().delete(id);
+			EventsDBMapper.INSTANCE.delete(id);
 			return ok();
 		} catch(Exception e) {
 			Logger.error(e.getMessage(),e);

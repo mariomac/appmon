@@ -39,7 +39,7 @@ public class Apps extends Controller {
 			end = now;
 		}
 
-		return Results.ok(AppsDBMapper.getInstance().getAllApps(start, end,false).toString());
+		return Results.ok(AppsDBMapper.INSTANCE.getAllApps(start, end, false).toString());
 	}
 
     public static Result listInstances(Long start, Long end) throws ParseException {
@@ -51,14 +51,14 @@ public class Apps extends Controller {
             end = now;
         }
 
-        return Results.ok(AppsDBMapper.getInstance().getAllApps(start, end,true).toString());
+        return Results.ok(AppsDBMapper.INSTANCE.getAllApps(start, end, true).toString());
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result onAppFinished() {
         try {
             String appInstance = request().body().asJson().toString();
-            AppsDBMapper.getInstance().addAppInstance(appInstance);
+            AppsDBMapper.INSTANCE.addAppInstance(appInstance);
             return ok();
         } catch(AppsDBMapper.AppException e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class Apps extends Controller {
         if(limit <= 0) {
             limit = null;
         }
-        return ok(AppsDBMapper.getInstance().getFinishedAppInstances(start, end, limit));
+        return ok(AppsDBMapper.INSTANCE.getFinishedAppInstances(start, end, limit));
     }
 
 }

@@ -26,7 +26,9 @@ public class AMQPTest
      */
     public void testCall() throws Exception {
 
-		String appName = "appJarl"+System.currentTimeMillis()%1000;
+		String appName = "SinusApp";
+		String nodeId = "TheSinusNode";
+
 		System.out.println("Initiating " + appName);
 		Properties p = new Properties();
 		p.load(getClass().getResourceAsStream("/jndi.properties"));
@@ -53,12 +55,13 @@ public class AMQPTest
 
 		TextMessage message = session.createTextMessage("{\n" +
 				"\t\"Command\" : \"initiateMonitoring\",\n" +
-				"\t\"SLAId\" : \"alskdfj\",\n" +
+				//"\t\"SLAId\" : \"alskdfj\",\n" +
 				"\t\"ApplicationId\" : \""+ appName + "\",\n" +
-				"\t\"DeploymentId\" : \"lasdkjf\",\n" +
-				"\t\"VMId\" : \"asdfljsladkfj\",\n" +
-				"\t\"Terms\" : [\"list\", \"of\", \"terms\", \"to\", \"monitor\" ],\n" +
-				"\t\"Frequency\" : 12039\n" +
+				//"\t\"ApplicationId\" : \""+ appName + "\",\n" +
+				//"\t\"DeploymentId\" : \"lasdkjf\",\n" +
+				//"\t\"VMId\" : \"asdfljsladkfj\",\n" +
+				"\t\"Terms\" : [\"metric\" ],\n" +
+				"\t\"Frequency\" : 10000\n" +
 				"}");
 		messageProducer.send(message);
 

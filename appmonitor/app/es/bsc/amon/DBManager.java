@@ -27,16 +27,13 @@ import java.util.Properties;
  * Created by mmacias on 27/05/14.
  */
 
-public class DBManager {
-	public static final DBManager instance = new DBManager();
+public enum DBManager {
+	INSTANCE;
     public static final int COLLECTION_ALREADY_EXISTS = 17399;
 
 	private MongoClient client;
 	private DB database;
     private Properties config;
-
-    private DBManager() {
-    }
 
 	public void init(Properties config) {
 		close();

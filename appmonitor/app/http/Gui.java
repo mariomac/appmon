@@ -12,22 +12,22 @@ import java.text.ParseException;
  */
 public class Gui extends Controller {
     public static Result getAllMetricPanels() throws ParseException {
-        return ok(GuiMetricsDBMapper.getInstance().getPanels());
+        return ok(GuiMetricsDBMapper.INSTANCE.getPanels());
     }
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result addMetricPanel() {
         try {
             String body = request().body().asJson().toString();
-            return ok(GuiMetricsDBMapper.getInstance().addPanel(body));
-        } catch(Exception e) {
+            return ok(GuiMetricsDBMapper.INSTANCE.addPanel(body));
+		} catch(Exception e) {
             e.printStackTrace();
             return internalServerError(e.getMessage());
         }
     }
 
     public static Result deleteMetricPanel(String id) {
-        GuiMetricsDBMapper.getInstance().deletePanel(id);
+        GuiMetricsDBMapper.INSTANCE.deletePanel(id);
         return ok();
     }
 }

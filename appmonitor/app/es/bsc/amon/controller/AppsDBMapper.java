@@ -29,15 +29,16 @@ import java.util.*;
 /**
  * Created by mmacias on 08/06/14.
  */
-public class AppsDBMapper {
-    private static AppsDBMapper instance;
+public enum AppsDBMapper {
+    INSTANCE;
+
     private DBCollection colAppInstances;
 
     private AppsDBMapper() {
         // default table size to 64 MB
         Logger.info("Creating collection '"+ COLL_NAME +"'...");
-        Properties config = DBManager.instance.getConfig();
-        DB database = DBManager.instance.getDatabase();
+        Properties config = DBManager.INSTANCE.getConfig();
+        DB database = DBManager.INSTANCE.getDatabase();
 
         try {
 
@@ -58,13 +59,6 @@ public class AppsDBMapper {
         BasicDBObject indexInfo = new BasicDBObject();
         indexInfo.put(EventsDBMapper.TIMESTAMP, -1); // 1 for ascending, -1 for descending
         colAppInstances.createIndex(indexInfo);
-    }
-
-    public static AppsDBMapper getInstance() {
-        if(instance == null) {
-            instance = new AppsDBMapper();
-        }
-        return instance;
     }
 
     public void addAppInstance(String appInstanceJson) {
@@ -104,7 +98,7 @@ public class AppsDBMapper {
                 "{ '$and' : [ { endtime : { '$gte' : " + start + " }}, { endtime : {'$lte' : " + end + "}} ] }" +
             "]}");
         //DBObject orderby = new BasicDBObject("timestamp":-1);
-        BasicDBList ret = DBManager.instance.find(EventsDBMapper.COLL_NAME, query);
+        BasicDBList ret = DBManager.INSTANCE.find(EventsDBMapper.COLL_NAME, query);
 
         Map<String,Set<String>> appsInfo = new HashMap<>();
 
@@ -124,7 +118,7 @@ public class AppsDBMapper {
             } catch(NullPointerException ex) {
                 Logger.warn("This element did not parsed as an application: " + event.toString() + ". Removing it from DB...");
                 try {
-                    EventsDBMapper.getInstance().remove(event);
+                    EventsDBMapper.INSTANCE.remove(event);
                 } catch(Exception e) {
                     Logger.error("Cannot remove it from database");
                 }
@@ -148,7 +142,7 @@ public class AppsDBMapper {
                 "{ '$and' : [ { timestamp : { '$gte' : " + start + " }}, { timestamp : {'$lte' : " + end + "}} ] }," +
                 "{ '$and' : [ { endtime : { '$gte' : " + start + " }}, { endtime : {'$lte' : " + end + "}} ] }" +
                 "]}");
-        BasicDBList ret = DBManager.instance.find(COLL_NAME, query, null, limit);
+        BasicDBList ret = DBManager.INSTANCE.find(COLL_NAME, query, null, limit);
         return ret.toString();
     }
 

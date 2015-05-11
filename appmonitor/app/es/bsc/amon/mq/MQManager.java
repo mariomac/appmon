@@ -14,8 +14,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.*;
 
-public class MQManager {
-	public static final MQManager instance = new MQManager();
+public enum MQManager {
+	INSTANCE;
 
 	Context context;
 	Connection connection;
@@ -28,7 +28,7 @@ public class MQManager {
 	MessageDispatcher messageDispatcherInstance;
 	PeriodicNotificationSender periodicNotificationSender;
 
-	Map<String,CommandDispatcher> commandDispatchers = new TreeMap<String,CommandDispatcher>();
+	Map<String,CommandDispatcher> commandDispatchers = new HashMap<String,CommandDispatcher>();
 
 	public void init() {
 
@@ -54,7 +54,7 @@ public class MQManager {
 			periodicNotificationSender = new PeriodicNotificationSender();
 			new Thread(periodicNotificationSender).start();
 
-			commandDispatchers.put("initiateMonitoring", new InitiateMonitoringDispatcher(session));
+			commandDispatchers.put(InitiateMonitoringDispatcher.COMMAND_NAME, new InitiateMonitoringDispatcher(session));
 
 			Logger.info("Message Queue Manager Sucessfully created...");
 
@@ -76,7 +76,13 @@ public class MQManager {
 		}
 	}
 
+	public void addPeriodicNotifier(PeriodicNotifier pn) {
+		periodicNotificationSender.addNotifier(pn);
+	}
 
+	public void removeNotifier(PeriodicNotifier pn) {
+		periodicNotificationSender.removeNotifier(pn);
+	}
 
 	private class MessageDispatcher implements Runnable {
 		boolean running;
@@ -86,7 +92,7 @@ public class MQManager {
 			while(running) {
 				try {
 					TextMessage message = (TextMessage)messageConsumer.receive();
-					Logger.trace("received message: " + message.getText());
+					Logger.debug("received message: " + message.getText());
 
 					ObjectNode on = (ObjectNode)Json.parse(message.getText());
 					String command =  on.get(CommandDispatcher.FIELD_COMMAND).textValue();
@@ -109,10 +115,8 @@ public class MQManager {
 
 		private List<Tuple> notifiers = Collections.synchronizedList(new LinkedList<Tuple>());
 
-		private SortedSet<Tuple> notifiersToAdd = new TreeSet<Tuple>();
-
 		public void addNotifier(PeriodicNotifier pn) {
-			notifiersToAdd.add(new Tuple(pn));
+			notifiers.add(new Tuple(pn));
 		}
 
 		public void removeNotifier(PeriodicNotifier pn) {

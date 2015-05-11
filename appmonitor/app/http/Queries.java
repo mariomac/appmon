@@ -29,9 +29,9 @@ public class Queries extends Controller {
     public static Result post() {
         String contentType = request().getHeader("Content-Type");
         if("application/json".equals(contentType)) {
-            return ok(QueriesDBMapper.instance.aggregate(request().body().asJson()));
+            return ok(QueriesDBMapper.INSTANCE.aggregate(request().body().asJson()));
         } else if("text/plain".equals(contentType)) {
-            return ok(QueriesDBMapper.instance.aggregate(request().body().asText()));
+            return ok(QueriesDBMapper.INSTANCE.aggregate(request().body().asText()));
         } else {
             return badRequest("Unknown mime type. Supported types are:\n" +
                     "\tapplication/json for MongoDB JSON-like aggregation query\n" +

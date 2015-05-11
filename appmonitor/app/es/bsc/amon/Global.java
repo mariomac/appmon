@@ -29,7 +29,6 @@ import play.mvc.Results;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
@@ -46,12 +45,12 @@ public class Global extends GlobalSettings {
 			p.setProperty(name, configuration.getString(name));
 		}
 
-		DBManager.instance.init(p);
+		DBManager.INSTANCE.init(p);
 
 		try {
-			MQManager.instance.init();
+			MQManager.INSTANCE.init();
 		} catch(Exception e) {
-			Logger.error("Error when creating the MQ Manager instance: " + e.getMessage(), e);
+			Logger.error("Error when creating the MQ Manager INSTANCE: " + e.getMessage(), e);
 		}
 
 		return c;
@@ -61,8 +60,8 @@ public class Global extends GlobalSettings {
 	public void onStop(Application app) {
 
 		super.onStop(app);
-		DBManager.instance.close();
-		MQManager.instance.stop();
+		DBManager.INSTANCE.close();
+		MQManager.INSTANCE.stop();
 	}
 
     @Override

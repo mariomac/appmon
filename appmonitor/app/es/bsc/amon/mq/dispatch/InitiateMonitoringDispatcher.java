@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.mq.CommandDispatcher;
+import es.bsc.amon.mq.MQManager;
 import play.Logger;
 import javax.jms.*;
 import javax.naming.Context;
@@ -12,12 +13,13 @@ import java.util.*;
 
 public class InitiateMonitoringDispatcher implements CommandDispatcher {
 
+	public static final String COMMAND_NAME = "initiateMonitoring";
 
-	private static final String FIELD_APP_ID = "ApplicationId";
-	private static final String FIELD_DEPLOYMENT_ID = "DeploymentId";
-	private static final String FIELD_TERMS = "Terms";
-	private static final String FIELD_FREQUENCY = "Frequency";
-	private static final String FIELD_SLA_ID = "SLAId";
+	public static final String FIELD_APP_ID = "ApplicationId";
+	public static final String FIELD_DEPLOYMENT_ID = "DeploymentId";
+	public static final String FIELD_TERMS = "Terms";
+	public static final String FIELD_FREQUENCY = "Frequency";
+	public static final String FIELD_SLA_ID = "SLAId";
 
 	private static final long DEFAULT_FREQUENCY = 5*60*1000;
 
@@ -41,8 +43,8 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 			String deploymentId = getString(msgBody, FIELD_DEPLOYMENT_ID);
 			String slaId = getString(msgBody, FIELD_SLA_ID);
 
-			if(appId == null && deploymentId == null && slaId == null) {
-				Exception ife = new IllegalArgumentException("appId == null && deploymentId == null && slaId == null");
+			if(appId == null && deploymentId == null) {
+				Exception ife = new IllegalArgumentException("appId == null && deploymentId == null");
 				throw ife;
 			}
 
@@ -66,14 +68,11 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 			JsonNode freqJson = msgBody.get(FIELD_FREQUENCY);
 			long frequency = freqJson == null ? DEFAULT_FREQUENCY : freqJson.asLong(DEFAULT_FREQUENCY);
 
-			AppMeasuresNotifier amn = new AppMeasuresNotifier(appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
+			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
 
+			MQManager.INSTANCE.addPeriodicNotifier(amn);
 
-			// TODO: METER TODA LA MIERDACA A CONTINUACIÓN EN LA CLASE APPMEASUERESNOTIFIER
-
-
-
-
+			Logger.debug("ON COMMAND InitiateMonitoringDispatcher");
 
 		} catch(IllegalArgumentException e ) {
 			Logger.debug("Bad command format: " + e.getMessage());
