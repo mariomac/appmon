@@ -2,18 +2,17 @@ package es.bsc.amon.mq;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.mq.dispatch.InitiateMonitoringDispatcher;
+import es.bsc.amon.mq.notif.PeriodicNotificationException;
 import es.bsc.amon.mq.notif.PeriodicNotifier;
 import play.Logger;
 import play.libs.Json;
 
 import javax.jms.*;
+import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class MQManager {
 	public static final MQManager instance = new MQManager();
@@ -27,6 +26,7 @@ public class MQManager {
 
 
 	MessageDispatcher messageDispatcherInstance;
+	PeriodicNotificationSender periodicNotificationSender;
 
 	Map<String,CommandDispatcher> commandDispatchers = new TreeMap<String,CommandDispatcher>();
 
@@ -50,9 +50,13 @@ public class MQManager {
 
 			messageDispatcherInstance = new MessageDispatcher();
 			new Thread(messageDispatcherInstance).start();
-			Logger.info("Message Queue Manager Sucessfully created...");
+
+			periodicNotificationSender = new PeriodicNotificationSender();
+			new Thread(periodicNotificationSender).start();
 
 			commandDispatchers.put("initiateMonitoring", new InitiateMonitoringDispatcher(session));
+
+			Logger.info("Message Queue Manager Sucessfully created...");
 
 		} catch(JMSException|NamingException e) {
 			Logger.error("Error initializing MQ Manager: " + e.getMessage() + " Continuing startup without MQ services...");
@@ -61,6 +65,7 @@ public class MQManager {
 
 	public void stop() {
 		if(messageDispatcherInstance != null) messageDispatcherInstance.running = false;
+		if(periodicNotificationSender != null) periodicNotificationSender.running = false;
 		try {
 			if(messageConsumer != null) messageConsumer.close();
 			if(session != null) session.close();
@@ -93,14 +98,65 @@ public class MQManager {
 						Logger.debug("While closing MessageDispatcher: " + e.getMessage(), e);
 					}
 				}
+				Thread.yield();
 			}
 			Logger.info("MessageDispatcher successfully finished...");
 		}
 	}
 
-	private class PeriodicNotificationSender implements Runnable {
-		List<PeriodicNotifier> notifier = new ArrayList<PeriodicNotifier>();
+	private static class PeriodicNotificationSender implements Runnable {
+		boolean running;
 
+		private List<Tuple> notifiers = Collections.synchronizedList(new LinkedList<Tuple>());
+
+		private SortedSet<Tuple> notifiersToAdd = new TreeSet<Tuple>();
+
+		public void addNotifier(PeriodicNotifier pn) {
+			notifiersToAdd.add(new Tuple(pn));
+		}
+
+		public void removeNotifier(PeriodicNotifier pn) {
+			synchronized (notifiers) {
+				for(Iterator<Tuple> tit = notifiers.iterator() ; tit.hasNext() ;) {
+					Tuple t = tit.next();
+					if(t.notifier == pn) {
+						tit.remove();
+						break;
+					}
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+			running = true;
+			while(running) {
+				synchronized (notifiers) {
+					long now = System.currentTimeMillis();
+					for(Tuple t : notifiers) {
+						if(t.nextNotification <= now) {
+							try {
+								t.notifier.sendNotification();
+							} catch(PeriodicNotificationException e) {
+								Logger.warn("Error sending notification: " + e.getMessage(), e);
+							}
+							t.nextNotification = now + t.notifier.getFrequency();
+						}
+					}
+				}
+				Thread.yield();
+			}
+		}
+
+		private static class Tuple {
+			long nextNotification;
+			final PeriodicNotifier notifier;
+
+			public Tuple(PeriodicNotifier notifier) {
+				this.notifier = notifier;
+				nextNotification = System.currentTimeMillis() + notifier.getFrequency();
+			}
+		}
 	}
 
 }
