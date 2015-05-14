@@ -17,10 +17,17 @@
 package es.bsc.amon;
 
 import com.mongodb.*;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSON;
+import org.bson.BSONObject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.BasicBSONList;
+import org.jongo.Jongo;
 import play.Logger;
-import play.libs.Json;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -31,6 +38,7 @@ public enum DBManager {
 	INSTANCE;
     public static final int COLLECTION_ALREADY_EXISTS = 17399;
 
+	//private Jongo jongo;
 	private MongoClient client;
 	private DB database;
     private Properties config;
@@ -45,6 +53,8 @@ public enum DBManager {
 			Logger.info("Connecting to mongodb://"+host+":"+port+"/"+dbName);
 			client = new MongoClient(host,port);
 			database = client.getDB(dbName);
+			//jongo = new Jongo(database);
+
 		} catch(Throwable e) {
 			Logger.info(e.getMessage());
 			throw new RuntimeException(e);
@@ -88,8 +98,6 @@ public enum DBManager {
             c.sort(orderby);
         }
 
-
-
         if(limit != null && limit > 0) {
             c = c.limit(limit);
         }
@@ -114,7 +122,5 @@ public enum DBManager {
     public void add(String collectionName, DBObject obj) {
         database.getCollection(collectionName).insert(obj);
     }
-
-
 
 }

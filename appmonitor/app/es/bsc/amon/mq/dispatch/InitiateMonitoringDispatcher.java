@@ -40,13 +40,13 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 	public void onCommand(ObjectNode msgBody) {
 		try {
 			String appId = getString(msgBody,FIELD_APP_ID);
+			if(appId == null) {
+				Exception ife = new IllegalArgumentException("Application ID cannot be null");
+				throw ife;
+			}
 			String deploymentId = getString(msgBody, FIELD_DEPLOYMENT_ID);
 			String slaId = getString(msgBody, FIELD_SLA_ID);
 
-			if(appId == null && deploymentId == null) {
-				Exception ife = new IllegalArgumentException("appId == null && deploymentId == null");
-				throw ife;
-			}
 
 			JsonNode termsJson = msgBody.get(FIELD_TERMS);
 			List<String> terms = new ArrayList<String>();
@@ -71,9 +71,6 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
 
 			MQManager.INSTANCE.addPeriodicNotifier(amn);
-
-			Logger.debug("ON COMMAND InitiateMonitoringDispatcher");
-
 		} catch(IllegalArgumentException e ) {
 			Logger.debug("Bad command format: " + e.getMessage());
 		} catch (Exception e) {

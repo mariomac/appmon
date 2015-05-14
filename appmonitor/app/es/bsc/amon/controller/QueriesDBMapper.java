@@ -21,9 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import es.bsc.amon.DBManager;
 import es.bsc.mongoal.QueryGenerator;
 import play.libs.Json;
 
@@ -32,7 +30,6 @@ import play.libs.Json;
  */
 public enum QueriesDBMapper {
 	INSTANCE;
-    private static es.bsc.mongoal.QueryGenerator mongoAlQG = null;
 
     /**
      * Uses the MongoDB Json query language
@@ -40,42 +37,27 @@ public enum QueriesDBMapper {
      * @return
      */
     public ArrayNode aggregate(JsonNode query) {
-        Object raw = JSON.parse(query.toString());
-        ArrayNode ret = new ArrayNode(JsonNodeFactory.instance);
-
-        if(raw instanceof BasicDBObject) {
-            ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBObject) raw).toString());
-        } else if(raw instanceof BasicDBList) {
-            ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBList) raw).toString());
-        }
-
-        return ret;
+    	return aggregateFromJsonStr(query.toString());
     }
 
     /**
      * Uses the MongoAL query language
      */
     public ArrayNode aggregate(String query) {
-        if(mongoAlQG == null) {
-            mongoAlQG = new QueryGenerator(DBManager.INSTANCE.getDatabase());
-        }
-
-        BasicDBList dbl = new BasicDBList();
-        Iterable<DBObject> it = mongoAlQG.query(query);
-        for(DBObject dbo : it) {
-            dbl.add(dbo);
-        }
-        return (ArrayNode)Json.parse(dbl.toString());
-
+        QueryGenerator qg = new QueryGenerator(query);
+        return aggregateFromJsonStr(qg.getJsonQueryString());
     }
 
-    public static final String START = "start";
-    public static final String END = "end";
-    public static final String APPID = "appId";
-    public static final String NODEID = "nodeId";
-    public static final String INSTANCEID = "instanceId";
-    public static final String OP = "op";
-    public static final String DATA = "data";
+	private ArrayNode aggregateFromJsonStr(String jsonQueryString) {
+		Object raw = JSON.parse(jsonQueryString);
+		ArrayNode ret = new ArrayNode(JsonNodeFactory.instance);
 
-    public enum Operation { sum, avg, max, min, first, last, count, array };
+		if(raw instanceof BasicDBObject) {
+			ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBObject) raw).toString());
+		} else if(raw instanceof BasicDBList) {
+			ret = (ArrayNode)Json.parse(EventsDBMapper.INSTANCE.aggregate((BasicDBList) raw).toString());
+		}
+
+		return ret;
+	}
 }

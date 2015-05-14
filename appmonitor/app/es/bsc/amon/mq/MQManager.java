@@ -81,7 +81,7 @@ public enum MQManager {
 	}
 
 	public void removeNotifier(PeriodicNotifier pn) {
-		periodicNotificationSender.removeNotifier(pn);
+		periodicNotificationSender.askForRemoval(pn);
 	}
 
 	private class MessageDispatcher implements Runnable {
@@ -114,18 +114,18 @@ public enum MQManager {
 		boolean running;
 
 		private List<Tuple> notifiers = Collections.synchronizedList(new LinkedList<Tuple>());
+		private Set<Tuple> askedForRemoval = Collections.synchronizedSet(new HashSet<Tuple>());
 
 		public void addNotifier(PeriodicNotifier pn) {
 			notifiers.add(new Tuple(pn));
 		}
 
-		public void removeNotifier(PeriodicNotifier pn) {
+		public void askForRemoval(PeriodicNotifier pn) {
 			synchronized (notifiers) {
 				for(Iterator<Tuple> tit = notifiers.iterator() ; tit.hasNext() ;) {
 					Tuple t = tit.next();
 					if(t.notifier == pn) {
-						tit.remove();
-						break;
+						askedForRemoval.add(t);
 					}
 				}
 			}
@@ -145,6 +145,13 @@ public enum MQManager {
 								Logger.warn("Error sending notification: " + e.getMessage(), e);
 							}
 							t.nextNotification = now + t.notifier.getFrequency();
+						}
+					}
+					if(askedForRemoval.size() > 0) {
+						Logger.debug("Removing the clients");
+						synchronized (askedForRemoval) {
+							notifiers.removeAll(askedForRemoval);
+							askedForRemoval.clear();
 						}
 					}
 				}

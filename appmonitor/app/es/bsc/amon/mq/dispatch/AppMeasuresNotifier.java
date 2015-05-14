@@ -1,13 +1,16 @@
 package es.bsc.amon.mq.dispatch;
 
+import com.avaje.ebean.QueryResultVisitor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.controller.EventsDBMapper;
 import es.bsc.amon.controller.QueriesDBMapper;
+import es.bsc.amon.mq.MQManager;
 import es.bsc.amon.mq.notif.PeriodicNotificationException;
 import es.bsc.amon.mq.notif.PeriodicNotifier;
+import es.bsc.mongoal.QueryGenerator;
 import play.Logger;
 
 import javax.jms.*;
@@ -15,6 +18,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -66,6 +70,8 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 				sb.append(" avg(data.").append(t).append(") as ").append(t);
 			}
 			queryTail = sb.toString();
+
+			removeOn = System.currentTimeMillis() + AUTO_REMOVAL_TIME;
 		} catch (JMSException | IOException | NamingException e) {
 			throw new PeriodicNotificationException("Error instantiating App Measures Notifier: " + e.getMessage(),e);
 		}
@@ -77,14 +83,27 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 		return frequency;
 	}
 
+	// TODO --> substitute AUTO-REMOVAL (initally 24h) BY
+	//				1 - Subscribte to App Manager events (on undeployment)
+	//				2 - Remove after X minutes/without new metrics
+	private static final long AUTO_REMOVAL_TIME = 24 * 60 * 60 * 1000;
+	private long removeOn;
 	@Override
 	public void sendNotification() throws PeriodicNotificationException {
 		long now = System.currentTimeMillis();
+		if(now >= removeOn) {
+			MQManager.INSTANCE.removeNotifier(this);
+			Logger.debug("Asking for AUTO-REMOVAL for notifier: " + toString());
+			return;
+		}
 		try {
 			StringBuilder sb = new StringBuilder(queryHead)
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" > ").append(now - frequency)
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);;
 							//EventsDBMapper
+
+			Logger.debug("Going to query: " + sb);
+			Logger.debug("Should output: " + new QueryGenerator(sb.toString()).getJsonQueryString());
 
 			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(sb.toString());
 			if(an != null && an.size() > 0) {
@@ -104,7 +123,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					for(String t : terms) {
 						termsON.set(t, jn.get(t));
 					}
-					response.put(InitiateMonitoringDispatcher.FIELD_TERMS, termsON);
+					response.set(InitiateMonitoringDispatcher.FIELD_TERMS, termsON);
 
 
 					TextMessage responseMessage = session.createTextMessage(response.toString());
@@ -115,6 +134,22 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			throw new PeriodicNotificationException("Error sending notification: " + e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "AppMeasuresNotifier{" +
+				"appId='" + appId + '\'' +
+				", deploymentId='" + deploymentId + '\'' +
+				", slaId='" + slaId + '\'' +
+				", terms=" + Arrays.toString(terms) +
+				", frequency=" + frequency +
+				", producer=" + producer +
+				", session=" + session +
+				", queryHead='" + queryHead + '\'' +
+				", queryTail='" + queryTail + '\'' +
+				'}';
+	}
+
 	private static final String TOPIC_PREFIX = "application-monitor.monitoring.";
 	private static final String TOPIC_SUFFIX = ".measurement";
 }
