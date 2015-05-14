@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="92591dbf-052f-4352-8783-84637b425379" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/lib/mongoal.jar" afterPath="$PROJECT_DIR$/../../appmonitor/lib/mongoal.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/AppMeasuresNotifier.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/AppMeasuresNotifier.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/DBManager.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/DBManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/EventsDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/EventsDBMapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/InitiateMonitoringDispatcher.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/dispatch/InitiateMonitoringDispatcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/MQManager.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/mq/MQManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/QueriesDBMapper.java" afterPath="$PROJECT_DIR$/../../appmonitor/app/es/bsc/amon/controller/QueriesDBMapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../appmonitor/build.sbt" afterPath="$PROJECT_DIR$/../../appmonitor/build.sbt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="AMQPTestClient.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -606,16 +599,16 @@
       <workItem from="1431349007363" duration="4045000" />
       <workItem from="1431432810064" duration="1843000" />
       <workItem from="1431510649601" duration="2842000" />
-      <workItem from="1431585834123" duration="1795000" />
+      <workItem from="1431585834123" duration="1872000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25140000" />
+    <option name="totallyTimeSpent" value="25217000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1680" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />

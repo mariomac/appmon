@@ -190,7 +190,6 @@ public enum EventsDBMapper {
     }
 
     public BasicDBList aggregate(BasicDBList query) {
-		Logger.debug("Querying : " + query.toString());
         List<DBObject> ql = new ArrayList<DBObject>(query.size());
         Iterator<Object> itq = query.iterator();
         while(itq.hasNext()) ql.add((DBObject)itq.next());

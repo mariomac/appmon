@@ -102,9 +102,6 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);;
 							//EventsDBMapper
 
-			Logger.debug("Going to query: " + sb);
-			Logger.debug("Should output: " + new QueryGenerator(sb.toString()).getJsonQueryString());
-
 			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(sb.toString());
 			if(an != null && an.size() > 0) {
 				for(JsonNode jn : an) {
