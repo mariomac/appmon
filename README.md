@@ -24,4 +24,4 @@ From the sources root, run the next command:
 `./activator run`
 
 
-Si te gustan mis aportaciones a github, quizás te gustará mi libro [Del bit a la Nube](http://www.xaas.guru/del-bit-a-la-nube/)
+Si te gustan mis aportaciones a github, quizás te gustará mi libro [Del bit a la Nube](http://www.macias.info/del-bit-a-la-nube/)
