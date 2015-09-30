@@ -94,7 +94,7 @@ public enum DBManager {
             c = database.getCollection(collectionName).find(query);
         }
 
-        if(orderby == null) {
+        if(orderby != null) {
             c.sort(orderby);
         }
 

@@ -142,7 +142,7 @@ public enum AppsDBMapper {
                 "{ '$and' : [ { timestamp : { '$gte' : " + start + " }}, { timestamp : {'$lte' : " + end + "}} ] }," +
                 "{ '$and' : [ { endtime : { '$gte' : " + start + " }}, { endtime : {'$lte' : " + end + "}} ] }" +
                 "]}");
-		DBObject orderBy = (DBObject) JSON.parse("{ endtime : 1 }");
+		DBObject orderBy = (DBObject) JSON.parse("{ endtime : -1 }");
         BasicDBList ret = DBManager.INSTANCE.find(COLL_NAME, query, orderBy, limit);
         return ret.toString();
     }
