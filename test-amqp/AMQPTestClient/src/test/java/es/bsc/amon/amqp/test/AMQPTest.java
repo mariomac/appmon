@@ -53,23 +53,25 @@ public class AMQPTest
 
 		MessageProducer messageProducer = session.createProducer(sendQueue);
 
-		TextMessage message = session.createTextMessage("{\n" +
+		String msg = "{\n" +
 				"\t\"Command\" : \"initiateMonitoring\",\n" +
 				//"\t\"SLAId\" : \"alskdfj\",\n" +
 				"\t\"ApplicationId\" : \""+ appName + "\",\n" +
 				//"\t\"ApplicationId\" : \""+ appName + "\",\n" +
-				//"\t\"DeploymentId\" : \"lasdkjf\",\n" +
+				//"\t\"DeploymentId\" : \"lasdkjf\",\n" +;
 				//"\t\"VMId\" : \"asdfljsladkfj\",\n" +
 				"\t\"Terms\" : [\"metric\" ],\n" +
 				"\t\"Frequency\" : 10000\n" +
-				"}");
+				"}" ;
+		System.out.println("msg = " + msg);
+		TextMessage message = session.createTextMessage(msg);
 		messageProducer.send(message);
 
 
 		System.out.println("Message sent");
 		String s = "";
 
-		while(!"Hello bye".equals(s)) {
+		while(!s.equals("exit")) {
 			System.out.println("Waiting for a new message...");
 			TextMessage tm = (TextMessage) clientTopic.receive();
 			s = tm.getText();
