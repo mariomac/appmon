@@ -68,14 +68,14 @@ public class Apps extends Controller {
 
     public static Result listFinishedInstances(Long start, Long end, Integer limit) {
         long now = System.currentTimeMillis();
-        if(start < 0L) {
+        if(start == null || start < 0L) {
             start = now + start;
         }
-        if(end <= 0L) {
+        if(end == null || end <= 0L) {
             end = now;
         }
-        if(limit <= 0) {
-            limit = null;
+        if(limit == null) {
+            limit = -1;
         }
         return ok(AppsDBMapper.INSTANCE.getFinishedAppInstances(start, end, limit));
     }
