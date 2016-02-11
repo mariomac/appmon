@@ -59,7 +59,7 @@ public enum MQManager {
 			Logger.info("Message Queue Manager Sucessfully created...");
 
 		} catch(JMSException|NamingException e) {
-			Logger.error("Error initializing MQ Manager: " + e.getMessage() + " Continuing startup without MQ services...");
+			Logger.error("Error initializing MQ Manager: " + e.getMessage() + ". Continuing startup without MQ services...");
 		}
 	}
 
