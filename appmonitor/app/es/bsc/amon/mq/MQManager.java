@@ -134,8 +134,8 @@ public enum MQManager {
 		@Override
 		public void run() {
 			running = true;
+			Logger.debug("Starting PeriodicNotificationSender thread");
 			while(running) {
-				Logger.debug("Starting PeriodicNotificationSender thread");
 				synchronized (notifiers) {
 					long now = System.currentTimeMillis();
 					for(Tuple t : notifiers) {
@@ -157,8 +157,13 @@ public enum MQManager {
 						}
 					}
 				}
-				Thread.yield();
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					Logger.warn(e.getMessage(),e);
+				}
 			}
+			Logger.warn("Exiting from PeriodicNotificationSender thread");
 		}
 
 		private static class Tuple {
