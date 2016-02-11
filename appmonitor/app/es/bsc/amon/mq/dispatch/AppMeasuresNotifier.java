@@ -122,8 +122,9 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					}
 					response.set(InitiateMonitoringDispatcher.FIELD_TERMS, termsON);
 
-
-					TextMessage responseMessage = session.createTextMessage(response.toString());
+					String responseStr = response.toString();
+					Logger.debug("Sending periodic notification: " + responseStr);
+					TextMessage responseMessage = session.createTextMessage(responseStr);
 					producer.send(responseMessage);
 				}
 			}
