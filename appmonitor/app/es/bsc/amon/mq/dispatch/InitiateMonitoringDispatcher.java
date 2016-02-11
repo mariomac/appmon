@@ -19,7 +19,7 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 	public static final String FIELD_DEPLOYMENT_ID = "DeploymentId";
 	public static final String FIELD_TERMS = "Terms";
 	public static final String FIELD_FREQUENCY = "Frequency";
-	public static final String FIELD_SLA_ID = "SLAId";
+	public static final String FIELD_SLA_ID = "slaId";
 
 	private static final long DEFAULT_FREQUENCY = 5*60*1000;
 
