@@ -101,9 +101,12 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" > ").append(now - frequency)
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);;
 							//EventsDBMapper
-
-			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(sb.toString());
-			if(an != null && an.size() > 0) {
+			String query = sb.toString();
+			Logger.debug("Sending query to aggregation framework: " + query);
+			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(query);
+			if(an == null || an.size() == 0) {
+				Logger.debug("Response is null or 0");
+			} if(an != null && an.size() > 0) {
 				for(JsonNode jn : an) {
 					ObjectNode response = JsonNodeFactory.instance.objectNode();
 					if(appId != null) {

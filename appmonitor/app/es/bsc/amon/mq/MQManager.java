@@ -143,10 +143,11 @@ public enum MQManager {
 							try {
 								Logger.debug("Time to send notification for " + t.notifier.toString());
 								t.notifier.sendNotification();
-							} catch(PeriodicNotificationException e) {
+							} catch(Exception e) {
 								Logger.warn("Error sending notification: " + e.getMessage(), e);
+							} finally {
+								t.nextNotification = now + t.notifier.getFrequency();
 							}
-							t.nextNotification = now + t.notifier.getFrequency();
 						}
 					}
 					if(askedForRemoval.size() > 0) {
