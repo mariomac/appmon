@@ -135,11 +135,13 @@ public enum MQManager {
 		public void run() {
 			running = true;
 			while(running) {
+				Logger.debug("Starting PeriodicNotificationSender thread");
 				synchronized (notifiers) {
 					long now = System.currentTimeMillis();
 					for(Tuple t : notifiers) {
 						if(t.nextNotification <= now) {
 							try {
+								Logger.debug("Time to send notification for " + t.notifier.toString());
 								t.notifier.sendNotification();
 							} catch(PeriodicNotificationException e) {
 								Logger.warn("Error sending notification: " + e.getMessage(), e);
