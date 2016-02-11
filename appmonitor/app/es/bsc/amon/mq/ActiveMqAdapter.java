@@ -55,7 +55,7 @@ public class ActiveMqAdapter {
 			session.close();
 			connection.close();
 		} catch (Exception e) {
-			Logger.warn("[VMM] Could not send topic " + topic + " to the message queue");
+			Logger.warn("[VMM] Could not send topic " + topic + " to the message queue", e);
 		} finally {
 			try {
 				session.close();
