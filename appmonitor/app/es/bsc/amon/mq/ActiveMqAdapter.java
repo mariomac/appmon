@@ -23,7 +23,7 @@ public class ActiveMqAdapter {
 		connectionFactory = new ActiveMQConnectionFactory(
 				p.getProperty("java.naming.security.principal"),
 				p.getProperty("java.naming.security.credentials"),
-				p.getProperty("connectionfactory.asceticpaas"));
+				p.getProperty("tcp.mqAddr"));
 	}
 
 	/**
