@@ -76,7 +76,7 @@
         $scope.form = {
             appId : "",
             nodeId : "",
-            instanceId : "",
+            deploymentId : "",
             description : "",
             metric : ""
         }
@@ -89,20 +89,20 @@
         $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
         }
-        $scope.appsInstances = [];
-        $http.get("/instances").then(function (response) {
-                $scope.appsInstances = response.data;
+        $scope.appsDeployments = [];
+        $http.get("/deployments").then(function (response) {
+                $scope.appsDeployments = response.data;
             });
         $scope.getApps = function() {
 
             var ret = [];
-            for(var a in $scope.appsInstances) {
+            for(var a in $scope.appsDeployments) {
                 ret.push(a);
             }
             return ret;
         }
-        $scope.getInstances = function() {
-            var ret = $scope.appsInstances[$scope.form.appId];
+        $scope.getDeployments = function() {
+            var ret = $scope.appsDeployments[$scope.form.appId];
             if(ret) {
                 return ret;
             } else {

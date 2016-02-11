@@ -1,6 +1,5 @@
 package es.bsc.amon.mq.dispatch;
 
-import com.avaje.ebean.QueryResultVisitor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -10,7 +9,6 @@ import es.bsc.amon.controller.QueriesDBMapper;
 import es.bsc.amon.mq.MQManager;
 import es.bsc.amon.mq.notif.PeriodicNotificationException;
 import es.bsc.amon.mq.notif.PeriodicNotifier;
-import es.bsc.mongoal.QueryGenerator;
 import play.Logger;
 
 import javax.jms.*;
@@ -20,7 +18,6 @@ import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.UUID;
 
 class AppMeasuresNotifier implements PeriodicNotifier {
 	final String appId;
@@ -59,7 +56,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 				}
 			}
 			if(deploymentId != null) {
-				sb.append(EventsDBMapper.INSTANCEID).append(" = '").append(deploymentId).append("' ");
+				sb.append(EventsDBMapper.DEPLOYMENT_ID).append(" = '").append(deploymentId).append("' ");
 			}
 			queryHead = sb.toString();
 

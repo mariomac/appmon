@@ -30,7 +30,7 @@ public class Event {
 	public Long endtime;
 	public String appId;
 	public String nodeId;
-	public String instanceId;
+	public String deploymentId;
 	public ObjectNode data;
 
 	public String getId() {

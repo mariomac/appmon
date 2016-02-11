@@ -149,7 +149,7 @@ document that includes the next properties:
     * The identifier of the application
 * `nodeId` (string), REQUIRED
     * The identifier of the node (e.g. hostname, IP, VM ID...) where the process is running
-* `instanceId` (string), OPTIONAL
+* `deploymentId` (string), OPTIONAL
     * The identifier of the instance/deployment. Useful, for example, when different instances
     of the same application are running at the same time.
 * `data` (JSON), OPTIONAL
@@ -164,7 +164,7 @@ Events can be *spot* events (if only `timestamp` parameter is specified) or *con
     
 + Response 200
 
-        { "_id" : { "$oid" : "53b119fee8c6182d22ee7bcc"} , "appId" : "SimpleApp" , "nodeId" : "SimpleNode" , "instanceId" : 41.12868376428366 , "data" : { "rnd" : 48.553120447770425 , "event" : "UP"} , "timestamp" : 1404115454543}
+        { "_id" : { "$oid" : "53b119fee8c6182d22ee7bcc"} , "appId" : "SimpleApp" , "nodeId" : "SimpleNode" , "deploymentId" : 41.12868376428366 , "data" : { "rnd" : 48.553120447770425 , "event" : "UP"} , "timestamp" : 1404115454543}
 
 ### Mark as finished [PATCH]
 
@@ -213,7 +213,7 @@ Posts the next information about a finished deployment:
 + Body content: an "application/json" object with the next structure:
     * `appId` (required, string)
         * Application Identifier
-    * `instanceId` (required, string)
+    * `deploymentId` (required, string)
         * Instance/Deployment Identifier
     * `data` (required, JSON), containing the next elements:
         * `start` Start time of deployment (free-form string)
@@ -222,7 +222,7 @@ Posts the next information about a finished deployment:
     * Example
     
         {"appId" : "MyWebService",
-        "instanceId" : "Deployment3234",
+        "deploymentId" : "Deployment3234",
         "data" : {
         	"start" : "2015/10/20 10:33:22 UTC",
         	"end" : "2015/10/25 1:30:29 UTC",
@@ -231,7 +231,7 @@ Posts the next information about a finished deployment:
 + Invocation example:
 
         $ curl -X POST -H "Content-type: application/json" --data \
-        '{ "appId" : "MyWebService", "instanceId" : "Deployment3234", "data" :
+        '{ "appId" : "MyWebService", "deploymentId" : "Deployment3234", "data" :
         { "start" : "2015/10/20 10:33:22 UTC", "end" : "2015/10/25 1:30:29 UTC",
         "power" : "120 Wh" }}' http://paas-stable:9000/apps
                 
@@ -260,7 +260,7 @@ by the timestamp they were submitted, in descending order.
         * `_id`: a JSON object with a property named `$oid`, whose value is a string containing a
           unique identifier for the application information, as stored in the database.
         * `appId`: a string representing the Application Identifier as reported by the client app
-        * `instanceId`: a string representing the Instance/Deployment Identifier as reported by the client
+        * `deploymentId`: a string representing the Instance/Deployment Identifier as reported by the client
         * `data` a JSON object containing the next properties:
             * `start` Start time of deployment (free-form string) as reported by the client
             * `end` End time of deployment (free-form string) as reported by the client
@@ -270,7 +270,7 @@ by the timestamp they were submitted, in descending order.
 
         [ { "_id" : { "$oid" : "560d384f929e0764a802a786"},
             "appId" : "MyWebService",
-            "instanceId" : "Deployment3234",
+            "deploymentId" : "Deployment3234",
             "data" : {
                 "start" : "2015/10/20 10:33:22 UTC" ,
                 "end" : "2015/10/25 1:30:29 UTC" ,

@@ -42,7 +42,7 @@ public class Apps extends Controller {
 		return Results.ok(AppsDBMapper.INSTANCE.getAllApps(start, end, false).toString());
 	}
 
-    public static Result listInstances(Long start, Long end) throws ParseException {
+    public static Result listDeployments(Long start, Long end) throws ParseException {
         long now = System.currentTimeMillis();
         if(start < 0L) {
             start = now + start;
@@ -57,8 +57,8 @@ public class Apps extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result onAppFinished() {
         try {
-            String appInstance = request().body().asJson().toString();
-            AppsDBMapper.INSTANCE.addAppInstance(appInstance);
+            String appDeployment = request().body().asJson().toString();
+            AppsDBMapper.INSTANCE.addAppDeployment(appDeployment);
             return ok();
         } catch(AppsDBMapper.AppException e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class Apps extends Controller {
         }
     }
 
-    public static Result listFinishedInstances(Long start, Long end, Integer limit) {
+    public static Result listFinishedDeployments(Long start, Long end, Integer limit) {
         long now = System.currentTimeMillis();
         if(start == null || start < 0L) {
             start = now + start;
@@ -77,7 +77,7 @@ public class Apps extends Controller {
         if(limit == null) {
             limit = -1;
         }
-        return ok(AppsDBMapper.INSTANCE.getFinishedAppInstances(start, end, limit));
+        return ok(AppsDBMapper.INSTANCE.getFinishedAppDeployments(start, end, limit));
     }
 
 }

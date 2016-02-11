@@ -40,13 +40,13 @@
 
     var MAX_ROWS = 12;
     var REFRESH = 5000;
-    globalView.controller("FinishedInstancesController", ["$http","$scope","$interval",function($http, $scope, $interval) {
-        $scope.finishedInstances = [ ];
+    globalView.controller("FinishedDeploymentsController", ["$http","$scope","$interval",function($http, $scope, $interval) {
+        $scope.finishedDeployments = [ ];
         $scope.latestTimestamp = 0;
         var getFinishedApps = function() {
             $http.get("/apps/finished?limit="+MAX_ROWS)
                 .success(function(ret) {
-                    $scope.finishedInstances = ret;
+                    $scope.finishedDeployments = ret;
                 });
         }
         getFinishedApps();

@@ -32,7 +32,7 @@ import java.util.*;
 public enum AppsDBMapper {
     INSTANCE;
 
-    private DBCollection colAppInstances;
+    private DBCollection colAppDeployments;
 
     private AppsDBMapper() {
         // default table size to 64 MB
@@ -44,7 +44,7 @@ public enum AppsDBMapper {
 
 
             int collectionSize = Integer.parseInt(config.getProperty("collection.size"));
-            colAppInstances = database.createCollection(COLL_NAME,
+            colAppDeployments = database.createCollection(COLL_NAME,
                     new BasicDBObject("capped", true) //enable round robin database
                             .append("size", collectionSize));
 
@@ -52,27 +52,27 @@ public enum AppsDBMapper {
             if(cfe.getCode() == DBManager.COLLECTION_ALREADY_EXISTS) {
                 Logger.info("Collection '"+ COLL_NAME +"' already exists. Continuing normally...");
             }
-            colAppInstances = database.getCollection(COLL_NAME);
+            colAppDeployments = database.getCollection(COLL_NAME);
         }
 
         // compound index events by timestamp, appId and nodeId
         BasicDBObject indexInfo = new BasicDBObject();
         indexInfo.put(EventsDBMapper.TIMESTAMP, -1); // 1 for ascending, -1 for descending
-        colAppInstances.createIndex(indexInfo);
+        colAppDeployments.createIndex(indexInfo);
     }
 
-    public void addAppInstance(String appInstanceJson) {
-        BasicDBObject dbo = (BasicDBObject) JSON.parse(appInstanceJson);
+    public void addAppDeployment(String appDeploymentJson) {
+        BasicDBObject dbo = (BasicDBObject) JSON.parse(appDeploymentJson);
         BasicDBObject data = ((BasicDBObject)dbo.get(FIELD_DATA));
         if( data == null
             || dbo.get(FIELD_APP_ID) == null
-            || dbo.get(FIELD_INSTANCE_ID) == null
+            || dbo.get(FIELD_DEPLOYMENT_ID) == null
             || data.get(FIELD_DATA_START) == null
             || data.get(FIELD_DATA_END) == null
             || data.get(FIELD_DATA_POWER) == null){
             throw new AppException("The App document must have the following structure:\n"
                     + "{'appId' : ...\n"
-                    + "'instanceId' : ...\n"
+                    + "'deploymentId' : ...\n"
                     + "'data' : {\n"
                     + "\t'start' : ....\n"
                     + "\t'end' : ....\n"
@@ -81,17 +81,17 @@ public enum AppsDBMapper {
         }
         long timestamp = System.currentTimeMillis();
         dbo.put(FIELD_TIMESTAMP, timestamp);
-        colAppInstances.insert(dbo);
+        colAppDeployments.insert(dbo);
     }
 
     /**
      *
      * @param start
      * @param end
-     * @param showInstances if true, shows instances information instead of nodes information
+     * @param showDeployments if true, shows instances information instead of nodes information
      * @return
      */
-    public ObjectNode getAllApps(long start, long end, boolean showInstances) {
+    public ObjectNode getAllApps(long start, long end, boolean showDeployments) {
         DBObject query = (DBObject) JSON.parse(
             "{ '$or' : ["+
                 "{ '$and' : [ { timestamp : { '$gte' : " + start + " }}, { timestamp : {'$lte' : " + end + "}} ] }," +
@@ -107,7 +107,7 @@ public enum AppsDBMapper {
             DBObject event = (DBObject) iter.next();
             try {
                 String appName = event.get(EventsDBMapper.APPID).toString();
-                Object node = event.get(showInstances ? EventsDBMapper.INSTANCEID : EventsDBMapper.NODEID);
+                Object node = event.get(showDeployments ? EventsDBMapper.DEPLOYMENT_ID : EventsDBMapper.NODEID);
                 String nodeName = node==null?"":node.toString();
                 Set<String> appSet = appsInfo.get(appName);
                 if (appSet == null) {
@@ -136,7 +136,7 @@ public enum AppsDBMapper {
         return all;
     }
 
-    public String getFinishedAppInstances(long start, long end, int limit) {
+    public String getFinishedAppDeployments(long start, long end, int limit) {
         DBObject query = (DBObject) JSON.parse(
                 "{ '$or' : ["+
                 "{ '$and' : [ { timestamp : { '$gte' : " + start + " }}, { timestamp : {'$lte' : " + end + "}} ] }," +
@@ -149,12 +149,12 @@ public enum AppsDBMapper {
 
     public static final String FIELD_TIMESTAMP = "timestamp";
     public static final String FIELD_APP_ID = "appId";
-    public static final String FIELD_INSTANCE_ID = "instanceId";
+    public static final String FIELD_DEPLOYMENT_ID = "deploymentId";
     public static final String FIELD_DATA = "data";
     public static final String FIELD_DATA_START = "start";
     public static final String FIELD_DATA_END = "end";
     public static final String FIELD_DATA_POWER = "power";
-    public static final String COLL_NAME = "appinstances";
+    public static final String COLL_NAME = "appdeployments";
 
     public class AppException extends RuntimeException {
         public AppException(String message) {
