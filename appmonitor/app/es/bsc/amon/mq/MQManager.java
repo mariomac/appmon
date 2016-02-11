@@ -141,7 +141,7 @@ public enum MQManager {
 					for(Tuple t : notifiers) {
 						if(t.nextNotification <= now) {
 							try {
-								Logger.debug("Time to send notification for " + t.notifier.toString());
+//								Logger.debug("Time to send notification for " + t.notifier.toString());
 								t.notifier.sendNotification();
 							} catch(Exception e) {
 								Logger.warn("Error sending notification: " + e.getMessage(), e);

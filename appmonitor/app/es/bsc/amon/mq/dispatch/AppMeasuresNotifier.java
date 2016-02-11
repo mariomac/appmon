@@ -99,10 +99,10 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);;
 							//EventsDBMapper
 			String query = sb.toString();
-			Logger.debug("Sending query to aggregation framework: " + query);
+//			Logger.debug("Sending query to aggregation framework: " + query);
 			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(query);
 			if(an == null || an.size() == 0) {
-				Logger.debug("Response is null or 0");
+//				Logger.debug("Response is null or 0");
 			} if(an != null && an.size() > 0) {
 				for(JsonNode jn : an) {
 					ObjectNode response = JsonNodeFactory.instance.objectNode();
@@ -123,7 +123,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					response.set(InitiateMonitoringDispatcher.FIELD_TERMS, termsON);
 
 					String responseStr = response.toString();
-					Logger.debug("Sending periodic notification: " + responseStr);
+//					Logger.debug("Sending periodic notification: " + responseStr);
 					TextMessage responseMessage = session.createTextMessage(responseStr);
 					producer.send(responseMessage);
 				}
