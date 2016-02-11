@@ -38,7 +38,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			this.slaId = slaId;
 			this.terms = terms;
 			this.frequency = frequency;
-			String topicName = new StringBuilder(TOPIC_PREFIX).append(appId).append(TOPIC_SUFFIX).toString();
+			String topicName = TOPIC_PREFIX + appId + TOPIC_SUFFIX;
 			String topicKey = "topic." + appId;
 			Properties p = new Properties();
 			p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndi.properties"));
