@@ -68,7 +68,7 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 			JsonNode freqJson = msgBody.get(FIELD_FREQUENCY);
 			long frequency = freqJson == null ? DEFAULT_FREQUENCY : freqJson.asLong(DEFAULT_FREQUENCY);
 
-			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
+			AppMeasuresNotifier amn = new AppMeasuresNotifier(appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
 
 			MQManager.INSTANCE.addPeriodicNotifier(amn);
 		} catch(IllegalArgumentException e ) {
