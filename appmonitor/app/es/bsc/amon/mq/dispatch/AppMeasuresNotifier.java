@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import es.bsc.amon.controller.EventsDBMapper;
 import es.bsc.amon.controller.QueriesDBMapper;
+import es.bsc.amon.mq.ActiveMqAdapter;
 import es.bsc.amon.mq.MQManager;
 import es.bsc.amon.mq.notif.PeriodicNotificationException;
 import es.bsc.amon.mq.notif.PeriodicNotifier;
@@ -25,28 +26,20 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 	final String slaId;
 	final String[] terms;
 	final long frequency;
-	final MessageProducer producer;
-	final Session session;
-
 	String queryHead, queryTail;
 
-	public AppMeasuresNotifier(Session session, String appId, String deploymentId, String slaId, String[] terms, long frequency) throws PeriodicNotificationException {
+	final ActiveMqAdapter messageQueue;
+	final String topicName;
+
+	public AppMeasuresNotifier(String appId, String deploymentId, String slaId, String[] terms, long frequency) throws PeriodicNotificationException {
 		try {
-			this.session = session;
 			this.appId = appId;
 			this.deploymentId = deploymentId;
 			this.slaId = slaId;
 			this.terms = terms;
 			this.frequency = frequency;
-			String topicName = TOPIC_PREFIX + appId + TOPIC_SUFFIX;
-			String topicKey = "topic." + appId;
-			Properties p = new Properties();
-			p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndi.properties"));
-			p.put(topicKey, topicName);
-			final Context context = new InitialContext(p);
-			context.addToEnvironment(topicKey, topicName);
-			final Topic topic = (Topic) context.lookup(appId);
-			producer = session.createProducer(topic);
+			topicName = TOPIC_PREFIX + appId + TOPIC_SUFFIX;
+			messageQueue = new ActiveMqAdapter();
 
 			StringBuilder sb = new StringBuilder("FROM ").append(EventsDBMapper.COLL_NAME).append(" MATCH ");
 			if(appId != null) {
@@ -69,7 +62,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			queryTail = sb.toString();
 
 			removeOn = System.currentTimeMillis() + AUTO_REMOVAL_TIME;
-		} catch (JMSException | IOException | NamingException e) {
+		} catch (Exception e) {
 			throw new PeriodicNotificationException("Error instantiating App Measures Notifier: " + e.getMessage(),e);
 		}
 	}
@@ -124,11 +117,11 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 
 					String responseStr = response.toString();
 //					Logger.debug("Sending periodic notification: " + responseStr);
-					TextMessage responseMessage = session.createTextMessage(responseStr);
-					producer.send(responseMessage);
+
+					messageQueue.publishMessage(topicName, responseStr);
 				}
-			}
-		} catch(JMSException e) {
+				}
+		} catch(Exception e) {
 			throw new PeriodicNotificationException("Error sending notification: " + e.getMessage(), e);
 		}
 	}
@@ -141,10 +134,11 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 				", slaId='" + slaId + '\'' +
 				", terms=" + Arrays.toString(terms) +
 				", frequency=" + frequency +
-				", producer=" + producer +
-				", session=" + session +
 				", queryHead='" + queryHead + '\'' +
 				", queryTail='" + queryTail + '\'' +
+				", messageQueue=" + messageQueue +
+				", topicName='" + topicName + '\'' +
+				", removeOn=" + removeOn +
 				'}';
 	}
 
