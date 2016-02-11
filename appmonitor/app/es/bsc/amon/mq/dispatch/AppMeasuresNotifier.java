@@ -63,12 +63,10 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			}
 			queryHead = sb.toString();
 
-			sb = new StringBuilder(" GROUP BY"); //.append(EventsDBMapper.TIMESTAMP).append(" - ").append(EventsDBMapper.TIMESTAMP).append(" % ").append(getFrequency());
+			sb = new StringBuilder(" GROUP BY NOTHING"); //.append(EventsDBMapper.TIMESTAMP).append(" - ").append(EventsDBMapper.TIMESTAMP).append(" % ").append(getFrequency());
 
 			// AVERAGE OF ALL TERMS: TODO: consider specifying other aggregators: sum, max, min...
-			if(terms == null || terms.length == 0) {
-				sb.append(" NOTHING");
-			} else for(String t : terms) {
+			for(String t : terms) {
 				sb.append(" avg(data.").append(t).append(") as ").append(t);
 			}
 			queryTail = sb.toString();
