@@ -24,7 +24,7 @@ ENV["LANG"]="en_US.UTF-8"
 ENV["LC_NUMERIC"]="en_US.UTF-8"
 
 #one notification each second
-FREQUENCY = 5
+FREQUENCY = 1
 VERBOSE = true
 
 URL = URI(ARGV[0])

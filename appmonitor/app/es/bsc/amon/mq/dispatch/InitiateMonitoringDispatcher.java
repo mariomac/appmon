@@ -35,6 +35,18 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 		return jn == null ? null : jn.textValue();
 	}
 
+	/*
+	 {
+	 	"ApplicationId" : "...",
+	 	"DeploymentId" : "...",
+	 	"slaId" : "...",
+	 	"Frequency" : 1234
+	 	"Terms" : [ "a_term", "other_term", "percentile('some_term',90)"]
+	 }
+	 In the terms, the default behaviour is to return the average.
+	 If the "percentile" function is specified, it will return the percentile
+
+	 */
 
 	@Override
 	public void onCommand(ObjectNode msgBody) {
@@ -68,7 +80,7 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 			JsonNode freqJson = msgBody.get(FIELD_FREQUENCY);
 			long frequency = freqJson == null ? DEFAULT_FREQUENCY : freqJson.asLong(DEFAULT_FREQUENCY);
 
-			AppMeasuresNotifier amn = new AppMeasuresNotifier(appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
+			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
 
 			MQManager.INSTANCE.addPeriodicNotifier(amn);
 		} catch(IllegalArgumentException e ) {

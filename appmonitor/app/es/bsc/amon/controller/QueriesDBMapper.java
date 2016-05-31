@@ -25,6 +25,9 @@ import com.mongodb.util.JSON;
 import es.bsc.mongoal.QueryGenerator;
 import play.libs.Json;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by mmacias on 02/07/14.
  */
