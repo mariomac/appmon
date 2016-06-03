@@ -19,6 +19,7 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 	public static final String FIELD_DEPLOYMENT_ID = "DeploymentId";
 	public static final String FIELD_TERMS = "Terms";
 	public static final String FIELD_FREQUENCY = "Frequency";
+	public static final String FIELD_PERIOD = "Period";
 	public static final String FIELD_SLA_ID = "slaId";
 
 	private static final long DEFAULT_FREQUENCY = 5*60*1000;
@@ -79,8 +80,10 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 
 			JsonNode freqJson = msgBody.get(FIELD_FREQUENCY);
 			long frequency = freqJson == null ? DEFAULT_FREQUENCY : freqJson.asLong(DEFAULT_FREQUENCY);
+			JsonNode periodJson = msgBody.get(FIELD_PERIOD);
+			long period = periodJson == null ? -1 : periodJson.asLong(-1);
 
-			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency);
+			AppMeasuresNotifier amn = new AppMeasuresNotifier(session,appId,deploymentId, slaId, terms.toArray(new String[terms.size()]),frequency, period);
 
 			MQManager.INSTANCE.addPeriodicNotifier(amn);
 		} catch(IllegalArgumentException e ) {
