@@ -90,6 +90,7 @@ public enum MQManager {
 			running = true;
 			while(running) {
 				try {
+
 					TextMessage message = (TextMessage) commandQueueMessageConsumer.receive();
 					Logger.debug("received message: " + message.getText());
 
@@ -98,7 +99,28 @@ public enum MQManager {
 					commandDispatchers.get(command).onCommand(on);
 				} catch(Exception e) {
 					if(running) {
-						Logger.error("Error dispatching messages: " + e.getMessage(), e);
+						Logger.warn("Error dispatching messages: " + e.getMessage());
+						Logger.warn("Reconnecting to the MQ");
+						try {
+							commandQueueConnectionFactory
+									= (ConnectionFactory) context.lookup("asceticpaas");
+							commandQueueConnection = commandQueueConnectionFactory.createConnection();
+							commandQueueConnection.start();
+
+							commandQueueSession = commandQueueConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+							commandQueue = (Queue) context.lookup("appmon");
+
+							commandQueueMessageConsumer = commandQueueSession.createConsumer(commandQueue);
+						} catch(NamingException | JMSException re) {
+							Logger.error(re.getMessage(),re);
+							try {
+								Thread.sleep(10000);
+							} catch (InterruptedException e1) {
+								Logger.error(e1.getMessage(),e1);
+							}
+						}
+
 					} else {
 						Logger.debug("While closing MessageDispatcher: " + e.getMessage(), e);
 					}

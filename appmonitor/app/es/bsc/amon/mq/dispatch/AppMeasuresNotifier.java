@@ -65,9 +65,9 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			final Topic topic = (Topic) context.lookup(appId);
 			producer = session.createProducer(topic);
 
-			StringBuilder sb = new StringBuilder("FROM ").append(EventsDBMapper.COLL_NAME).append(" MATCH ");
+			StringBuilder sb = new StringBuilder("FROM ").append(EventsDBMapper.COLL_NAME).append(" MATCH ").append('\n');
 			if(appId != null) {
-				sb.append(EventsDBMapper.APPID).append(" = '").append(appId).append("' ");
+				sb.append(EventsDBMapper.APPID).append(" = '").append(appId).append("' ").append('\n');
 				if(deploymentId != null) {
 					sb.append("AND ");
 				}
@@ -90,19 +90,19 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					try {
 						switch(aggregateFunctionName) {
 							// percentile(metric,percent)
-							case "percentile":
+							case "percentile": {
 								String reportedName = "percentile_" + metric + "_" + parts[2];
 								Function function = new PercentileFunction(new Integer(parts[2]));
 								aggregateFunctions.put(reportedName,function);
 								sb.append( " push(data.").append(metric).append(") as ").append(reportedName);
-								break;
+								} break;
 							// max(metric)
 							case "max":
-								sb.append(" max(data.").append(metric).append(") as ").append( reportedName = "max_"+metric );
+								sb.append(" max(data.").append(metric).append(") as ").append( "max_"+metric );
 								break;
 							// last(metric)
 							case "last":
-								sb.append(" last(data.").append(metric).append(") as ").append( reportedName = "max_"+metric );
+								sb.append(" last(data.").append(metric).append(") as ").append( "last_"+metric );
 								break;
 							default:
 								throw new Exception("Unsuported function name: "+aggregateFunctionName);
@@ -112,7 +112,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 						throw new Exception("The syntax of the aggregate function seems invalid",e);
 					}
 				} else {
-					sb.append(" avg(data.").append(terms[i]).append(") as ").append(terms[i]);
+					sb.append(" avg(data.").append(term).append(") as ").append(term);
 				}
 			}
 			this.aggregateFunctions = Collections.unmodifiableMap(aggregateFunctions);
@@ -146,13 +146,14 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 		}
 		try {
 			long from = period > 0 ? period : frequency;
-			StringBuilder sb = new StringBuilder(queryHead)
-					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" > ").append(now - from)
-					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);;
+			StringBuilder sb = new StringBuilder(queryHead).append('\n')
+					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" > ").append(now - from).append('\n')
+					.append(" AND ").append(EventsDBMapper.TIMESTAMP).append(" <= ").append(now).append(queryTail);
 							//EventsDBMapper
 			String query = sb.toString();
-//			Logger.debug("Sending query to aggregation framework: " + query);
+			Logger.debug("Sending query to aggregation framework:\n" + query);
 			ArrayNode an = QueriesDBMapper.INSTANCE.aggregate(query);
+			Logger.info("Received: " + an.toString());
 
 			if(an == null || an.size() == 0) {
 //				Logger.debug("Response is null or 0");
@@ -171,7 +172,9 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 					response.put("Timestamp", System.currentTimeMillis());
 					// TO DO: optimize
 					ObjectNode termsON = JsonNodeFactory.instance.objectNode();
-					for(String t : terms) {
+					Iterator<String> fields = jn.fieldNames();
+					while(fields.hasNext()) {
+						String t = fields.next();
 						if(aggregateFunctions.containsKey(t) && jn.get(t).getNodeType() == JsonNodeType.ARRAY) {
 							ArrayNode arrayNode = (ArrayNode) jn.get(t);
 							if(arrayNode.size() > 0) {

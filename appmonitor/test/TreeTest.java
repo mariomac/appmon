@@ -13,12 +13,12 @@
  *
  * http://www.gnu.org/licenses/lgpl-2.1.html
  */
+
 import com.fasterxml.jackson.databind.JsonNode;
 import es.bsc.amon.util.tree.TreeNode;
 import es.bsc.amon.util.tree.TreeNodeFactory;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.junit.Ignore;
 import org.junit.Test;
-
 
 import static org.fest.assertions.Assertions.assertThat;
 
