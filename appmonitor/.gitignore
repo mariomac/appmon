@@ -2,3 +2,5 @@
 **/*.iml
 **/*.ipr
 .settings
+**/target
+logs/
