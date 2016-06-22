@@ -45,6 +45,8 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 	static Pattern aggregateParts = Pattern.compile("[\\(,\\)]");
 
 	public AppMeasuresNotifier(Session session, String appId, String deploymentId, String slaId, String[] terms, long frequency, long period) throws PeriodicNotificationException {
+		removeOn = System.currentTimeMillis() + AUTO_REMOVAL_TIME;
+
 		try {
 			this.session = session;
 			this.appId = appId;
@@ -118,7 +120,6 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			this.aggregateFunctions = Collections.unmodifiableMap(aggregateFunctions);
 			queryTail = sb.toString();
 
-			removeOn = System.currentTimeMillis() + AUTO_REMOVAL_TIME;
 		} catch (Exception e) {
 			Logger.error(e.getMessage(),e);
 			throw new PeriodicNotificationException("Error instantiating App Measures Notifier: " + e.getMessage(),e);
