@@ -3,21 +3,27 @@ package es.bsc.amon.mq.dispatch;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
 import es.bsc.amon.controller.EventsDBMapper;
+import es.bsc.amon.model.Event;
 import play.Logger;
 
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.io.IOException;
 import java.util.*;
 
-class AppEstimationsReader {
+public class AppEstimationsReader {
 
 	boolean running = true;
+	Thread theThread;
 
+	public void stop() {
+		running = false;
+	}
 	public AppEstimationsReader() {
 		try {
-			new Thread(new Runnable() {
+			theThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -36,17 +42,20 @@ class AppEstimationsReader {
 						while (running) {
 							try {
 								TextMessage tm = (TextMessage) clientTopic.receive(5000);
-//						{"provider":"00000","applicationid":"maximTestApp","eventid":null,"deploymentid":"938","vms":["5699"],"unit":"WATTHOUR","generattiontimestamp":"8 Apr 2016 08:57:56 GMT","referredtimestamp":"8 Apr 2016 08:57:56 GMT","value":"48.36”}
-								if (tm != null) System.out.println("received message: " + tm.getText());
-								ObjectNode estimation = (ObjectNode) new ObjectMapper().readTree(tm.getText());
-								ObjectNode asEvent = JsonNodeFactory.instance.objectNode();
-								asEvent.set(EventsDBMapper.APPID, estimation.get("applicationId"));
-								asEvent.set(EventsDBMapper.DEPLOYMENT_ID, estimation.get("deploymentid"));
-								ObjectNode data = JsonNodeFactory.instance.objectNode();
-								data.set("energyEstimation", estimation.get("value"));
-								asEvent.set(EventsDBMapper.DATA, data);
+//						{"lakjsf":null,"provider":"00000","applicationid":"maximTestApp","deploymentid":"938","vms":["5699"],"unit":"WATTHOUR","generattiontimestamp":"8 Apr 2016 08:57:56 GMT","referredtimestamp":"8 Apr 2016 08:57:56 GMT","value":48.36}
+								if (tm != null) {
+									System.out.println("received message: " + tm.getText());
 
-								submitEstimation(asEvent);
+									ObjectNode estimation = (ObjectNode) new ObjectMapper().readTree(tm.getText());
+									ObjectNode asEvent = JsonNodeFactory.instance.objectNode();
+									asEvent.set(EventsDBMapper.APPID, estimation.get("applicationid"));
+									asEvent.set(EventsDBMapper.DEPLOYMENT_ID, estimation.get("deploymentid"));
+									ObjectNode data = JsonNodeFactory.instance.objectNode();
+									data.set("energyEstimation", estimation.get("value"));
+									asEvent.set(EventsDBMapper.DATA, data);
+
+									submitEstimation(asEvent);
+								}
 								//EventsDBMapper.INSTANCE.storeEvent(asEvent);
 							} catch (Exception e) {
 								Thread.sleep(3000);
@@ -70,7 +79,9 @@ class AppEstimationsReader {
 						Logger.error("Error initializing EM estimations reader: " + e.getMessage());
 					}
 				}
-			}).start();
+			});
+
+			theThread.start();
 
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 				@Override
@@ -84,8 +95,30 @@ class AppEstimationsReader {
 		}
 	}
 
-	private void submitEstimation(ObjectNode event) {
-		esto petararrl
+	private void submitEstimation(ObjectNode event) throws JMSException, IOException, NamingException {
+		String appId = event.get(EventsDBMapper.APPID).asText();
+		String deploymentId = event.get(EventsDBMapper.DEPLOYMENT_ID).asText();
+
+		String topicName = TOPIC_PREFIX + appId + "." + deploymentId  + TOPIC_SUFFIX;
+		String topicKey = "topic." + appId + deploymentId;
+
+		Properties p = new Properties();
+		p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndi.properties"));
+		p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndiEstimations.properties"));
+		p.put(topicKey,topicName);
+
+		final Context context = new InitialContext(p);
+		TopicConnectionFactory connectionFactory
+				= (TopicConnectionFactory) context.lookup("asceticpaas");
+		TopicConnection connection = connectionFactory.createTopicConnection();
+		connection.start();
+		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+
+		Logger.debug("Submitting estimation to topic: " + topicName);
+		Logger.debug("Submitting next estimation: " + event.toString());
+		TextMessage estimationMessage = session.createTextMessage(event.toString());
+		final Topic topic = (Topic) context.lookup(appId+deploymentId);
+		session.createProducer(topic).send(estimationMessage);
 	}
 
 	final static String getTopicKey(String appId, String deploymentId) {

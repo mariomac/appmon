@@ -46,7 +46,6 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 
 	public AppMeasuresNotifier(Session session, String appId, String deploymentId, String slaId, String[] terms, long frequency, long period) throws PeriodicNotificationException {
 		removeOn = System.currentTimeMillis() + AUTO_REMOVAL_TIME;
-
 		try {
 			this.session = session;
 			this.appId = appId;
@@ -124,6 +123,7 @@ class AppMeasuresNotifier implements PeriodicNotifier {
 			Logger.error(e.getMessage(),e);
 			throw new PeriodicNotificationException("Error instantiating App Measures Notifier: " + e.getMessage(),e);
 		}
+
 	}
 
 
