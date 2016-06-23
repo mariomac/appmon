@@ -155,7 +155,7 @@ public class AppEstimationsReader {
 	private static final String EM_VALUE = "value";
 
 	// {"ApplicationId":"SinusApp","Timestamp":1431592067367,"Terms":{"metric":9.862471417356321}}
-	private static final String SLAM_APPID = "ApplicatinId";
+	private static final String SLAM_APPID = "ApplicationId";
 	private static final String SLAM_DEPLOYMENTID = "DeploymentId";
 	private static final String SLAM_TIMESTAMP = "Timestamp";
 	private static final String SLAM_TERMS = "Terms";
