@@ -25,9 +25,9 @@ public class InitiateMonitoringDispatcher implements CommandDispatcher {
 	private static final long DEFAULT_FREQUENCY = 5*60*1000;
 
 
-	private Session session;
+	private TopicSession session;
 
-	public InitiateMonitoringDispatcher(Session session) {
+	public InitiateMonitoringDispatcher(TopicSession session) {
 		this.session = session;
 	}
 

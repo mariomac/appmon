@@ -17,14 +17,14 @@ public enum MQManager {
 	INSTANCE;
 
 	Context context;
-	Connection commandQueueConnection;
-	ConnectionFactory commandQueueConnectionFactory;
-	Session commandQueueSession;
-	Queue commandQueue;
-	MessageConsumer commandQueueMessageConsumer;
+	TopicConnection commandTopicConnection;
+	TopicConnectionFactory commandTopicConnectionFactory;
+	TopicSession commandTopicSession;
+	Topic commandTopic;
+	MessageConsumer commandTopicMessageConsumer;
 
 
-	CommandQueueMessageDispatcher commandQueueMessageDispatcherInstance;
+	CommandTopicMessageDispatcher commandQueueMessageDispatcherInstance;
 	PeriodicNotificationSender periodicNotificationSender;
 
 	Map<String,CommandDispatcher> commandDispatchers = new HashMap<String,CommandDispatcher>();
@@ -36,24 +36,24 @@ public enum MQManager {
 
 			context = new InitialContext();
 
-			commandQueueConnectionFactory
-					= (ConnectionFactory) context.lookup("asceticpaas");
-			commandQueueConnection = commandQueueConnectionFactory.createConnection();
-			commandQueueConnection.start();
+			commandTopicConnectionFactory
+					= (TopicConnectionFactory) context.lookup("asceticpaas");
+			commandTopicConnection = commandTopicConnectionFactory.createTopicConnection();
+			commandTopicConnection.start();
 
-			commandQueueSession = commandQueueConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			commandTopicSession = commandTopicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 
-			commandQueue = (Queue) context.lookup("appmon");
+			commandTopic = (Topic) context.lookup("appmon");
 
-			commandQueueMessageConsumer = commandQueueSession.createConsumer(commandQueue);
+			commandTopicMessageConsumer = commandTopicSession.createSubscriber(commandTopic);
 
-			commandQueueMessageDispatcherInstance = new CommandQueueMessageDispatcher();
+			commandQueueMessageDispatcherInstance = new CommandTopicMessageDispatcher();
 			new Thread(commandQueueMessageDispatcherInstance).start();
 
 			periodicNotificationSender = new PeriodicNotificationSender();
 			new Thread(periodicNotificationSender).start();
 
-			commandDispatchers.put(InitiateMonitoringDispatcher.COMMAND_NAME, new InitiateMonitoringDispatcher(commandQueueSession));
+			commandDispatchers.put(InitiateMonitoringDispatcher.COMMAND_NAME, new InitiateMonitoringDispatcher(commandTopicSession));
 
 			Logger.info("Message Queue Manager Sucessfully created...");
 
@@ -66,9 +66,9 @@ public enum MQManager {
 		if(commandQueueMessageDispatcherInstance != null) commandQueueMessageDispatcherInstance.running = false;
 		if(periodicNotificationSender != null) periodicNotificationSender.running = false;
 		try {
-			if(commandQueueMessageConsumer != null) commandQueueMessageConsumer.close();
-			if(commandQueueSession != null) commandQueueSession.close();
-			if(commandQueueConnection != null) commandQueueConnection.close();
+			if(commandTopicMessageConsumer != null) commandTopicMessageConsumer.close();
+			if(commandTopicSession != null) commandTopicSession.close();
+			if(commandTopicConnection != null) commandTopicConnection.close();
 			if(context != null) context.close();
 		} catch(Exception e) {
 			Logger.error(e.getMessage());
@@ -83,7 +83,7 @@ public enum MQManager {
 		periodicNotificationSender.askForRemoval(pn);
 	}
 
-	private class CommandQueueMessageDispatcher implements Runnable {
+	private class CommandTopicMessageDispatcher implements Runnable {
 		boolean running;
 		@Override
 		public void run() {
@@ -91,7 +91,7 @@ public enum MQManager {
 			while(running) {
 				try {
 
-					TextMessage message = (TextMessage) commandQueueMessageConsumer.receive();
+					TextMessage message = (TextMessage) commandTopicMessageConsumer.receive();
 					Logger.debug("received message: " + message.getText());
 
 					ObjectNode on = (ObjectNode)Json.parse(message.getText());
@@ -102,16 +102,16 @@ public enum MQManager {
 						Logger.warn("Error dispatching messages: " + e.getMessage());
 						Logger.warn("Reconnecting to the MQ");
 						try {
-							commandQueueConnectionFactory
-									= (ConnectionFactory) context.lookup("asceticpaas");
-							commandQueueConnection = commandQueueConnectionFactory.createConnection();
-							commandQueueConnection.start();
+							commandTopicConnectionFactory
+									= (TopicConnectionFactory) context.lookup("asceticpaas");
+							commandTopicConnection = commandTopicConnectionFactory.createTopicConnection();
+							commandTopicConnection.start();
 
-							commandQueueSession = commandQueueConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+							commandTopicSession = commandTopicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 
-							commandQueue = (Queue) context.lookup("appmon");
+							commandTopic = (Topic) context.lookup("appmon");
 
-							commandQueueMessageConsumer = commandQueueSession.createConsumer(commandQueue);
+							commandTopicMessageConsumer = commandTopicSession.createSubscriber(commandTopic);
 						} catch(NamingException | JMSException re) {
 							Logger.error(re.getMessage(),re);
 							try {

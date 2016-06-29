@@ -85,7 +85,7 @@ class AppEstimationsReader {
 	}
 
 	private void submitEstimation(ObjectNode event) {
-		esto petararrl
+//		esto petararrl
 	}
 
 	final static String getTopicKey(String appId, String deploymentId) {
