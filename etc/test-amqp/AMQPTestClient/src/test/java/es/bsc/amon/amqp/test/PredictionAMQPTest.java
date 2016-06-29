@@ -1,7 +1,6 @@
 package es.bsc.amon.amqp.test;
 
 import junit.framework.TestCase;
-import org.apache.qpid.jms.message.JmsBytesMessage;
 
 import javax.jms.*;
 import javax.naming.Context;

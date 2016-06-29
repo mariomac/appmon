@@ -1,6 +1,7 @@
 package es.bsc.amon.mq;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import es.bsc.amon.mq.dispatch.AppEstimationsReader;
 import es.bsc.amon.mq.dispatch.InitiateMonitoringDispatcher;
 import es.bsc.amon.mq.notif.PeriodicNotifier;
 import play.Logger;
@@ -29,6 +30,7 @@ public enum MQManager {
 
 	Map<String,CommandDispatcher> commandDispatchers = new HashMap<String,CommandDispatcher>();
 
+	AppEstimationsReader estimationsReader;
 	public void init() {
 
 		try {
@@ -58,11 +60,18 @@ public enum MQManager {
 			Logger.info("Message Queue Manager Sucessfully created...");
 
 		} catch(JMSException|NamingException e) {
-			Logger.error("Error initializing MQ Manager: " + e.getMessage() + ". Continuing startup without MQ services...");
+			Logger.error("Error initializing MQ Manager: " + e.getMessage() + ". Continuing startup without MQ services...", e);
+		}
+		try {
+			estimationsReader = new AppEstimationsReader();
+		} catch(Exception e) {
+			Logger.error("Error instantiating AppEstimationsReader: " + e.getMessage(),e);
 		}
 	}
 
 	public void stop() {
+		if(estimationsReader != null) estimationsReader.stop();
+
 		if(commandQueueMessageDispatcherInstance != null) commandQueueMessageDispatcherInstance.running = false;
 		if(periodicNotificationSender != null) periodicNotificationSender.running = false;
 		try {

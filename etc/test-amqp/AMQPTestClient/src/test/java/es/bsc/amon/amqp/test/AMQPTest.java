@@ -55,11 +55,8 @@ public class AMQPTest
 
 		String msg = "{\n" +
 				"\t\"Command\" : \"initiateMonitoring\",\n" +
-				//"\t\"SLAId\" : \"alskdfj\",\n" +
 				"\t\"ApplicationId\" : \""+ appName + "\",\n" +
-				//"\t\"ApplicationId\" : \""+ appName + "\",\n" +
-				//"\t\"DeploymentId\" : \"lasdkjf\",\n" +;
-				//"\t\"VMId\" : \"asdfljsladkfj\",\n" +
+				"\t\"Period\": 60000,\n" +
 				"\t\"Terms\" : [\"metric\" ],\n" +
 				"\t\"Frequency\" : 10000\n" +
 				"}" ;
