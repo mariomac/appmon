@@ -12,6 +12,7 @@ import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -72,8 +73,15 @@ public enum MQManager {
 
                 context = new InitialContext();
 
-                commandTopicConnectionFactory
-                        = (TopicConnectionFactory) context.lookup("asceticpaas");
+                // piece of shit for ascetic testbeds
+                try {
+                    commandTopicConnectionFactory
+                            = (TopicConnectionFactory) context.lookup(InetAddress.getLocalHost().getHostName());
+                } catch(Exception e) {
+                    commandTopicConnectionFactory
+                            = (TopicConnectionFactory) context.lookup("default");
+                }
+
                 commandTopicConnection = commandTopicConnectionFactory.createTopicConnection();
                 commandTopicConnection.start();
 

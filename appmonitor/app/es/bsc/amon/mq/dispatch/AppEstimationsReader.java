@@ -9,6 +9,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,8 +37,17 @@ public class AppEstimationsReader {
 						p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndi.properties"));
 						p.load(InitiateMonitoringDispatcher.class.getResourceAsStream("/jndiEstimations.properties"));
 						final Context context = new InitialContext(p);
-						TopicConnectionFactory connectionFactory
-								= (TopicConnectionFactory) context.lookup("asceticpaas");
+
+						// piece of shit for ascetic testbeds
+						TopicConnectionFactory connectionFactory = null;
+						try {
+							connectionFactory
+									= (TopicConnectionFactory) context.lookup(InetAddress.getLocalHost().getHostName());
+						} catch(Exception e) {
+							connectionFactory
+									= (TopicConnectionFactory) context.lookup("default");
+						}
+
 						Topic topic = (Topic) context.lookup("prediction");
 						TopicConnection connection = connectionFactory.createTopicConnection();
 						connection.start();
@@ -81,8 +91,13 @@ public class AppEstimationsReader {
 								Logger.warn(e.getMessage(), e);
 								if (running) {
 									try {
-										connectionFactory
-												= (TopicConnectionFactory) context.lookup("asceticpaas");
+										try {
+											connectionFactory
+													= (TopicConnectionFactory) context.lookup(InetAddress.getLocalHost().getHostName());
+										} catch(Exception exx) {
+											connectionFactory
+													= (TopicConnectionFactory) context.lookup("default");
+										}
 										topic = (Topic) context.lookup("prediction");
 										connection = connectionFactory.createTopicConnection();
 										connection.start();
@@ -127,8 +142,16 @@ public class AppEstimationsReader {
 		p.put(topicKey,topicName);
 
 		final Context context = new InitialContext(p);
-		TopicConnectionFactory connectionFactory
-				= (TopicConnectionFactory) context.lookup("asceticpaas");
+		// piece of shit for ascetic testbeds
+		TopicConnectionFactory connectionFactory = null;
+		try {
+			connectionFactory
+					= (TopicConnectionFactory) context.lookup(InetAddress.getLocalHost().getHostName());
+		} catch(Exception e) {
+			connectionFactory
+					= (TopicConnectionFactory) context.lookup("default");
+		}
+
 		TopicConnection connection = connectionFactory.createTopicConnection();
 		connection.start();
 		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
