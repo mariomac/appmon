@@ -65,6 +65,7 @@ loop do
     event = {}
     event["appId"] = "SinusApp"
     event["nodeId"]="TheSinusNode"
+    event["slaId"]="xxx"
 
     data = {}
     data["metric"] = {}
